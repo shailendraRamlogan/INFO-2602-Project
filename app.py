@@ -36,6 +36,10 @@ jwt = JWT(app, authenticate, identity)
 def hello():
     return "WEB PROJECT"
 
+@app.route('/register')
+def register():
+    return app.send_static_file('signup.html')
+
 @app.route('/signup', methods=['POST'])
 def signup():
   userdata = request.get_json()
