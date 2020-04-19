@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_jwt import JWT, jwt_required, current_identity
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta 
@@ -38,7 +38,7 @@ def hello():
 
 @app.route('/register')
 def register():
-    return app.send_static_file('signup.html')
+    return render_template('signup.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
