@@ -1,0 +1,107 @@
+html, body{
+    height: 100%;
+    width: 100%;
+}
+
+body{
+    font-family: 'Comfortaa', cursive;
+}
+
+.nav{ 
+    background-color:aqua;
+    color:black;
+    position: fixed;
+    height: 10%;
+    width: 100%;
+}
+
+.navBar{
+    width: 100%;
+    height: 10%;
+}
+
+#home{
+    position: absolute;
+    right: 30px;
+    top: 40%;
+    bottom: 50%;
+}
+
+h1{
+    display: inline;
+    position: absolute;
+    left: 20px;
+    top: 40%;
+    bottom: 50%;
+}
+
+.main{
+    height: 90%;
+    width: 100%;
+    position: fixed;
+}
+
+#listing{
+    display: block;
+    width: 30%;
+    max-height: 600px;
+    height: 100%;
+    background-color:white;
+    color: black;
+    position: relative;
+    left: 0px;
+    text-align:left;
+}
+
+.details{
+    top: 0px;
+    display: inline-block;
+    width: 70%;
+    height: 100%;
+    /* max-height: 600px; */
+    background-color:white;
+    position: absolute;
+    right: 0px;
+    text-align: center;
+    color: black;
+}
+
+#result{
+    font-size: x-large;
+    display: inline-block;
+    margin: 0 auto;
+    padding: 3px;
+}
+
+img{
+    min-width: 300px;
+    min-height: 300px;
+}
+
+ul{
+    list-style-type: none;
+    overflow: scroll;
+}
+
+li{
+    text-align: left;
+    margin: 5px 5px 0px 5px;
+}
+
+li a{
+    display: block;
+}
+
+li:last-child{
+    border-bottom: none;
+}
+
+li a:hover{
+    background-color:aqua;
+    color: black;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
