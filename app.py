@@ -34,7 +34,7 @@ jwt = JWT(app, authenticate, identity)
 
 @app.route('/')
 def hello():
-    return render_template('index.html')
+    return app.send_static_file('index.html')
 
 @app.route('/register')
 def register():

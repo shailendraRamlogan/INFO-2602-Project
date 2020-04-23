@@ -1,90 +1,133 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Recipe Generator</title>
+    <title>Recipes</title>
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="style.css" type="text/css"/>
+    <style>
+      .App {
+        min-height: 100vh;
+        background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+      }
+  
+      .searchForm{
+        min-height: 10vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+  
+  
+      .searchBar{
+        width: 50%;
+        border: none;
+        padding: 10px;
+      }
+  
+      .searchButton{
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        background: lightcoral;
+      }
+  
+      #recipes{
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+      .recipe{
+        border-radius: 10px;
+        box-shadow: 0px 5px 20px rgb(71, 71, 71);
+        margin: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        background: white;
+        align-items: center;
+        min-width: 40%;
+      }
+
+      .image{
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;  
+      }
+
+      li {
+        list-style: none;
+        font-weight: 500;
+      }
+    </style>
   </head>
 
   <body>
-    <div class="navBar">
-      <nav class="nav">
-        <h1>Recipe Generator</h1>
-        <a id="home" href="index.html">Listing</a>
-      </nav>
-    </div>
-    <div>
-      <form onSubmit="getSearch(event);" class="searchForm">
-        <input class="searchBar" onChange="setSearch(event);" type="text"/>
-        <button class="searchButton" type="submit">Search</button>
-      </form>
+      <div class="App">
+        <div>
+        <form onSubmit="getSearch(event);" class="searchForm">
+          <input class="searchBar" onChange="setSearch(event);" type="text"/>
+          <button class="searchButton" type="submit">Search</button>
+        </form>
 
-    </div>
-    <main>
-      <div>
-        <div id="recipes">
-        
-        </div>
       </div>
-    </main>
-      <script>
-        const appID = '09922bc4';
-        const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
-        var query = 'chicken';
-        var search = '';
-        let url='https://api.edamam.com/search?q=chicken&app_id=09922bc4&app_key=7b4e785f51b5bdfb12595b7b385b35a6';
-    
-        async function getRecipes(url){
-          try{
-            let response = await fetch(url);
-            let data = await response.json();
-            console.log(data.hits);
-            listRecipe(data.hits);
-          }
-          catch(e){
-            console.log(e);
-          }
-        }
-
-
-        function listRecipe(recipeList){ //Renders a list of pokemon links to the page 
-          let count = 10;
-          for (let i = 0; i < count; ++i) {
-            displayRecipe(recipeList[i].recipe);
-          }
-        }
-    
-        function displayRecipe(recipeData){
-          result = document.querySelector('#recipes');
-          ingredients = recipeData.ingredients;
-          result.innerHTML+='';
-          result.innerHTML += `
-            <h3>${recipeData.label}</h3>
-            <img src="${recipeData.image}">
-            <p>Source : "${recipeData.url}"</p>
-            <p>Calories : ${recipeData.calories}</p>`
-          // for (ingredient in ingredients){
-          //   result.innerHTML +=`
-          //     <p>Ingredients:</p>
-          //     <ul>
-          //       <li>${ingredient.text}</li>
-          //     </ul>
-          //   `
-          // }
-        }
-    
-    
-        function setSearch(e){
-          search = e.target.value;
-        }
-        function getSearch(e){
-          e.preventDefault();
-          query = search;
-          //document.getElementByID("searchBar").value = '';
-        }
-        getRecipes(url);
-    
-      </script>
+      <div id="recipes">
+        
+      </div>
+      </div>
   </body>
+ 
+  <script>
+    
+    const appID = '09922bc4';
+    const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
+    var query = '';
+    var search = '';
+
+    async function getRecipies(){
+      try{
+        let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
+        let data = await response.json();
+        displayRecipies(data.hits);
+      }
+      catch(e){
+        console.log(e);
+      }
+    }
+
+    function displayRecipies(records){
+      data = document.querySelector('#recipes');
+      data.innerHTML += ``;
+      for (record in records){
+        ingredients = records[record].recipe.ingredients;
+        data.innerHTML += `
+          <div class="recipe">
+          <h1>${records[record].recipe.label}</h1>
+          <p>Calories : ${records[record].recipe.calories}<p>
+          <img class="image" src="${records[record].recipe.image}"/>
+          </div>
+        `;
+        //for (ingredient in ingredients){
+          //data.innerHTML +=`
+            //<ul>
+              //<li>${ingredients[ingredient].text}</li>
+           // </ul>
+          //`
+        //}
+        //data.innerHTML +=`</div>`
+      }
+    }
+
+
+    function setSearch(e){
+      search = e.target.value;
+    }
+    function getSearch(e){
+      e.preventDefault();
+      query = search;
+      //document.getElementByID("searchBar").value = '';
+      getRecipies();
+    }
+    
+
+  </script>
 </html>
