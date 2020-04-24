@@ -4,24 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" type="text/css" href="../static/style.css">
 </head>
 <body>
   <div class="hero">
     <div class="form-box">
       <div class="button-box">
         <div id="btn"></div>
-        <button type="button" class="toggle-btn">SignUp</button>
-        <button type="button" class="toggle-btn">LogIn</button>
+        <button type="button" class="toggle-btn" onclick="signup()">SignUp</button>
+        <button type="button" class="toggle-btn" onclick="login()">LogIn</button>
       </div>
+      <div class="formtext">Please carefully fill out the form.</div>
       <form id="signup" class="input-group">
-        <input type="text" class="input-field" placeholder="Name" required>
-        <input type="password" class="input-field" placeholder="Password" required>
-        <input type="checkbox" class="chkbx"><span>Remember Password</span>
+        <input name="name" type="text" class="input-field" placeholder="Name" minlength="8" required>
+        <input name="email" type="email" class="input-field" placeholder="Email" required>
+        <input name="password" type="password" class="input-field" placeholder="Password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$">
+        <input name="cpassword" type="password" class="input-field" placeholder="Confirm Password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$"> 
+        <input id="chkbx" type="checkbox" class="chkbx"><span>I agree to terms & conditions</span>
         <button type="submit" class="submit-btn">SignUp</button>
+      </form>
+      <form id="login" class="input-group">
+        <input name="name" type="text" class="input-field" placeholder="Name" minlength="8" required>
+        <input name="password" type="password" class="input-field" placeholder="Password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$">
+        <input type="checkbox" class="chkbx"><span>Remember Password</span>
+        <button type="submit" class="submit-btn">LogIn</button>
       </form>
     </div>
   </div>
-  <script></script>
+  <script src="../static/script.js"></script>
+  <script>
+    let x= document.getElementById("signup");
+    let y= document.getElementById("login");
+    let z= document.getElementById("btn");
+
+    function login(){
+      x.style.left= "-400px";
+      y.style.left= "50px";
+      z.style.left= "110px";
+    }
+
+    function signup(){
+      x.style.left= "50px";
+      y.style.left= "450px";
+      z.style.left= "0px";
+    }
+  </script>
 </body>
 </html>

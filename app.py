@@ -22,7 +22,7 @@ db.create_all(app=app)
 
 def authenticate(uname, password):
     #search for the specified user
-    user = User.query.filter_by(username=uname).first()
+    user = User.query.filter_by(name=uname).first()
     #if user is found and password matches
     if user and user.check_password(password):
         return user
@@ -43,15 +43,15 @@ def register():
 @app.route('/signup', methods=['POST'])
 def signup():
     userdata = request.get_json()
-    newuser = User(username=userdata['username'], email=userdata['email'])
+    newuser = User(name=userdata['name'], email=userdata['email'])
     newuser.set_password(userdata['password'])
     try:
         db.session.add(newuser)
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        return 'username or email already exists', 401
-    return 'user created', 201
+        return 'name or email already exists', 401
+    return 'User ' + newuser.name+' created', 201
 
 @app.route('/ingredients')
 @jwt_required()

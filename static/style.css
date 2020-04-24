@@ -1,115 +1,13 @@
-html, body{
-    height: 100%;
-    width: 100%;
-}
-
-body{
-    font-family: 'Comfortaa', cursive;
-}
-
-.nav{ 
-    background-color:aqua;
-    color:black;
-    position: fixed;
-    height: 10%;
-    width: 100%;
-}
-
-.navBar{
-    width: 100%;
-    height: 10%;
-}
-
-#home{
-    position: absolute;
-    right: 30px;
-    top: 40%;
-    bottom: 50%;
-}
-
-h1{
-    display: inline;
-    position: absolute;
-    left: 20px;
-    top: 40%;
-    bottom: 50%;
-}
-
-.main{
-    height: 90%;
-    width: 100%;
-    position: fixed;
-}
-
-#listing{
-    display: block;
-    width: 30%;
-    max-height: 600px;
-    height: 100%;
-    background-color:white;
-    color: black;
-    position: relative;
-    left: 0px;
-    text-align:left;
-}
-
-.details{
-    top: 0px;
-    display: inline-block;
-    width: 70%;
-    height: 100%;
-    /* max-height: 600px; */
-    background-color:white;
-    position: absolute;
-    right: 0px;
-    text-align: center;
-    color: black;
-}
-
-#result{
-    font-size: x-large;
-    display: inline-block;
-    margin: 0 auto;
-    padding: 3px;
-}
-
-img{
-    min-width: 300px;
-    min-height: 300px;
-}
-
-ul{
-    list-style-type: none;
-    overflow: scroll;
-}
-
-li{
-    text-align: left;
-    margin: 5px 5px 0px 5px;
-}
-
-li a{
-    display: block;
-}
-
-li:last-child{
-    border-bottom: none;
-}
-
-li a:hover{
-    background-color:aqua;
-    color: black;
-}
-
 *{
     margin: 0;
     padding: 0;
+    font-family: sans-serif;
 }
 
 .hero{
     height: 100%;
     width: 100%;
-    background: linear-gradient(to right,#2193b0, #6dd5ed);
+    background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
     background-position: center;
     background-size: cover;
     position: absolute;
@@ -121,12 +19,15 @@ li a:hover{
     margin: 6% auto;
     background: #fff;
     padding: 5px;
+    overflow: hidden;
 }
 .button-box{
     width: 220px;
-    margin: 35px auto;
+    margin: 30px auto;
+    margin-bottom: 25px;
     position: relative;
     border-radius: 30px;
+    text-align: center;
 }
 .toggle-btn{
     padding: 10px 30px;
@@ -136,13 +37,60 @@ li a:hover{
     outline: none;
     position: relative;
 }
-/* #btn{
+#btn{
     top: 0;
     left: 0;
     position: absolute;
     width: 110px;
     height: 100%;
-    background: linear-gradient(to right, #2193b0, #6dd5ed);
+    background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
     border-radius: 30px;
+    transition: .3s;
+}
+.formtext{
+    margin: auto;
+    text-align: center;
+}
+.input-group{
+    top: 128px;
+    position: absolute;
+    width: 280px;
     transition: .5s;
-} */
+}
+.input-field{
+    width: 100%;
+    padding: 10px 0;
+    margin: 10px 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid #999;
+    outline: none;
+    background: transparent;
+}
+.submit-btn{
+    width: 55%;
+    padding: 10px 30px;
+    cursor: pointer;
+    display: block;
+    margin: 30px auto;
+    border: 0;
+    outline: none;
+    border-radius: 30px;
+    background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+}
+.chkbx{
+    margin: 5px 5px 10px 0;
+}
+span{
+    margin-top: 4px;
+    color: #777;
+    font-size: 12px;
+    position: absolute;
+}
+#signup{
+    left: 50px;
+}
+#login{
+    left: 450px;
+}
