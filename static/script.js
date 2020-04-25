@@ -1,4 +1,4 @@
-let url='http://0.0.0.0:8080';
+let url='http://127.0.0.1:8080';
 
 function signUpSubmit(event){
     event.preventDefault();//prevents page redirection
@@ -23,7 +23,7 @@ function signUpSubmit(event){
         alert("Please agree to terms & conditions.");
         return false;
     }
-    postData('http://0.0.0.0:8080/signup',data);
+    postData(`${url}/signup`,data);
     console.log(data);
 }
 
@@ -36,15 +36,16 @@ function logInSubmit(event){
     let myform = event.target.elements;
    
     let data = {
-      name: myform['name'].value,
+      username: myform['name'].value,
       password: myform['password'].value
     }
    
-    //postData(url,data);
+    postData(`${url}/auth`,data);
     console.log(data);
 }
 
 async function postData(url, data){
+    console.log(url);
     try{ 
        let response = await fetch(
          url, 
@@ -57,7 +58,9 @@ async function postData(url, data){
        
        let result = await response.text();//2. Get message from response
        alert(result);//3. Do something with the message
+       console.log(result);
     }catch(error){
+        alert(error);
         console.log(error);//catch and log any errors
     }
 }
