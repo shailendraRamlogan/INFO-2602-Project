@@ -1,17 +1,25 @@
 import json
-from flask import Flask, request, render_template
+from flask_login import LoginManager, current_user, login_user, login_required
+from flask import Flask, request, render_template, redirect, flash, url_for
 from flask_jwt import JWT, jwt_required, current_identity
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta 
 
 from models import db, User, MyIngredients
 
+login_manager = LoginManager()
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = "MYSECRET"
-    app.config['JWT_EXPIRATION_DELTA'] = timedelta(days = 7) 
+    app.config['JWT_EXPIRATION_DELTA'] = timedelta(days = 7)
+    login_manager.init_app(app)
     db.init_app(app)
     return app
 
@@ -33,6 +41,7 @@ def identity(payload):
 jwt = JWT(app, authenticate, identity)
 
 @app.route('/')
+@jwt_required()
 def hello():
     return app.send_static_file('index.html')
 
@@ -50,8 +59,8 @@ def signup():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        return 'name or email already exists', 401
-    return 'User ' + newuser.name+' created', 201
+        return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
+    return 'User ' + newuser.name+' created, Please Login to continue.', 201
 
 @app.route('/ingredients')
 @jwt_required()

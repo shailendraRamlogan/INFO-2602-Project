@@ -1,4 +1,72 @@
 let url='http://127.0.0.1:8080';
+let server='http://127.0.0.1:8080';
+let message='';
+let token='';
+
+async function signUp(url, data){
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'POST',
+        body: JSON.stringify(data),//convert data to JSON string
+        headers: {'Content-Type':'application/json'}// JSON data
+      },
+    );//1. Send http request and get response
+     
+    let result = await response.text();//2. Get message from response
+    alert(result);
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
+}
+
+async function logIn(url, data){
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'POST',
+        body: JSON.stringify(data),//convert data to JSON string
+        headers: {'Content-Type':'application/json'}// JSON data
+      },
+    );//1. Send http request and get response
+    
+    let result = await response.text();//2. Get message from response
+    message=JSON.parse(result);
+    if(message.hasOwnProperty('access_token')){
+      token=message.access_token;
+      console.log(token);
+      homePage(server, token);
+    }else{
+      alert(result);//3. Do something with the message
+      console.log(result);
+    }
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
+}
+
+async function homePage(url, token){
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        body: null,//convert data to JSON string
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response;
+    console.log(result);
+    window.location.replace(result.url);
+  }catch(e){
+    console.log(e);
+  }
+}
 
 function signUpSubmit(event){
     event.preventDefault();//prevents page redirection
@@ -17,13 +85,13 @@ function signUpSubmit(event){
     }
 
     if(data.password !== cpassword){
-        alert("Passwords Do Not Match.");
-        return false;
+      alert("Passwords Do Not Match.");
+      return false;
     } else if(chkbx.checked!==true){
-        alert("Please agree to terms & conditions.");
-        return false;
+      alert("Please agree to terms & conditions.");
+      return false;
     }
-    postData(`${url}/signup`,data);
+    signUp(`${url}/signup`,data);
     console.log(data);
 }
 
@@ -40,30 +108,29 @@ function logInSubmit(event){
       password: myform['password'].value
     }
    
-    postData(`${url}/auth`,data);
-    console.log(data);
+    logIn(`${url}/auth`,data);
 }
 
-async function postData(url, data){
-    console.log(url);
-    try{ 
-       let response = await fetch(
-         url, 
-         {
-            method: 'POST',
-            body: JSON.stringify(data),//convert data to JSON string
-            headers: { 'Content-Type':'application/json' }// JSON data
-         },
-       );//1. Send http request and get response
-       
-       let result = await response.text();//2. Get message from response
-       alert(result);//3. Do something with the message
-       console.log(result);
-    }catch(error){
-        alert(error);
-        console.log(error);//catch and log any errors
-    }
+async function addIngred(url, data){
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'POST',
+        body: JSON.stringify(data),//convert data to JSON string
+        headers: { 'Content-Type':'application/json',
+                    'Authorization':`jwt ${token}`}// JSON data
+      },
+    );//1. Send http request and get response
+    
+    let result = await response.text();//2. Get message from response
+    alert(result);//3. Do something with the message
+    console.log(result);
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
 }
 
-  document.forms['signup'].addEventListener('submit',signUpSubmit);
-  document.forms['login'].addEventListener('submit',logInSubmit);
+document.forms['signup'].addEventListener('submit',signUpSubmit);
+document.forms['login'].addEventListener('submit',logInSubmit);
