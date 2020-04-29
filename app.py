@@ -19,7 +19,6 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = "MYSECRET"
     app.config['JWT_EXPIRATION_DELTA'] = timedelta(days = 7)
-    login_manager.init_app(app)
     db.init_app(app)
     return app
 
@@ -41,7 +40,7 @@ def identity(payload):
 jwt = JWT(app, authenticate, identity)
 
 @app.route('/')
-@jwt_required()
+#@jwt_required()
 def hello():
     return app.send_static_file('index.html')
 
@@ -62,11 +61,11 @@ def signup():
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
 
-@app.route('/ingredients')
+@app.route('/ingredients', methods=['POST'])
 @jwt_required()
 def add_ingredient():
     userdata = request.get_json()
-    ingredient = MyIngredient(name=userdata['name'])
+    ingredient = MyIngredient(name=userdata['name'], id=current_identity.id)
     try:
         db.session.add(ingredient)
         db.session.commit()
@@ -74,6 +73,33 @@ def add_ingredient():
         db.session.rollback()
         return 'Ingredient already added.', 401
     return ingredient.name + 'added.', 201
+
+@app.route('/ingredients', methods=['GET'])
+@jwt_required()
+def getIngredients():
+  ingredients = MyIngredients.query.filter_by(id=current_identity.id).all()
+  ingredients = [ingredient.toDict() for ingredient in ingredients]
+  if ingredients == None:
+    return 'There are currently no ingredients added to your list.', 200
+  return json.dumps(ingredients), 200
+
+@app.route('/ingredients/<name>', methods=['GET'])
+@jwt_required()
+def getIngredient(name):
+  ingredient = MyIngredients.query.filter_by(id=current_identity.id,name=name).first()
+  if ingredient == None:
+    return 'No ingredient with that name exists.'
+  return json.dumps(ingredient.toDict()),200
+
+@app.route('/ingredients/<name>', methods=['DELETE'])
+@jwt_required()
+def deleteIngredient(name):
+    ingredient = MyIngredients.query.filter_by(id=current_identity.id,name=name).first()
+    if ingredient == None:
+        return 'No ingredient named '+name, 403
+    db.session.delete(ingredient)
+    db.session.commit()
+    return name + ' successfully deleted.',202
 
 
 

@@ -88,6 +88,7 @@
         let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
         let data = await response.json();
         displayRecipies(data.hits);
+        console.log(data.hits);
       }
       catch(e){
         console.log(e);
@@ -96,23 +97,23 @@
 
     function displayRecipies(records){
       data = document.querySelector('#recipes');
-      data.innerHTML += ``;
-      for (record in records){
-        ingredients = records[record].recipe.ingredients;
+      data.innerHTML = ``;
+      for (i=0; i<10;i++){
+        //let ingredients = records[i].recipe.ingredients;
         data.innerHTML += `
           <div class="recipe">
-          <h1>${records[record].recipe.label}</h1>
-          <p>Calories : ${records[record].recipe.calories}<p>
-          <img class="image" src="${records[record].recipe.image}"/>
+          <h1>${records[i].recipe.label}</h1>
+          <p>Calories : ${records[i].recipe.calories}<p>
+          <img class="image" src="${records[i].recipe.image}"/>
           </div>
         `;
-        //for (ingredient in ingredients){
-          //data.innerHTML +=`
-            //<ul>
-              //<li>${ingredients[ingredient].text}</li>
-           // </ul>
-          //`
-        //}
+        // or (ingredient in ingredients){
+        //   data.innerHTML +=`
+        //     <ul>
+        //       <li>${ingredients[ingredient].text}</li>
+        //     </ul>
+        // `
+        // }f
         //data.innerHTML +=`</div>`
       }
     }
@@ -124,7 +125,6 @@
     function getSearch(e){
       e.preventDefault();
       query = search;
-      //document.getElementByID("searchBar").value = '';
       getRecipies();
     }
     
