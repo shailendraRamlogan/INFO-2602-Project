@@ -65,14 +65,14 @@ def signup():
 @jwt_required()
 def add_ingredient():
     userdata = request.get_json()
-    ingredient = MyIngredient(name=userdata['name'], id=current_identity.id)
+    ingredient = MyIngredients(name=userdata['name'], id=current_identity.id)
     try:
         db.session.add(ingredient)
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
         return 'Ingredient already added.', 401
-    return ingredient.name + 'added.', 201
+    return ingredient.name + ' added.', 201
 
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()
@@ -83,23 +83,27 @@ def getIngredients():
     return 'There are currently no ingredients added to your list.', 200
   return json.dumps(ingredients), 200
 
-@app.route('/ingredients/<name>', methods=['GET'])
+@app.route('/ingredients', methods=['GET'])
 @jwt_required()
-def getIngredient(name):
-  ingredient = MyIngredients.query.filter_by(id=current_identity.id,name=name).first()
-  if ingredient == None:
-    return 'No ingredient with that name exists.'
-  return json.dumps(ingredient.toDict()),200
+def getIngredient():
+    userdata= request.get_json()
+    name = userdata['name']
+    ingredient = MyIngredients.query.filter_by(id=current_identity.id, name=name).first()
+    if ingredient == None:
+        return 'No ingredient with that name exists.'
+    return json.dumps(ingredient.toDict()),200
 
-@app.route('/ingredients/<name>', methods=['DELETE'])
+@app.route('/ingredients', methods=['DELETE'])
 @jwt_required()
-def deleteIngredient(name):
-    ingredient = MyIngredients.query.filter_by(id=current_identity.id,name=name).first()
+def deleteIngredient():
+    userdata=request.get_json()
+    name = userdata['name']
+    ingredient = MyIngredients.query.filter_by(id=current_identity.id, name=name).first()
     if ingredient == None:
         return 'No ingredient named '+name, 403
     db.session.delete(ingredient)
     db.session.commit()
-    return name + ' successfully deleted.',202
+    return name + ' successfully removed.',202
 
 
 

@@ -8,7 +8,6 @@ class User(db.Model):
     name = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
-    ingredients = db.relationship('MyIngredients',backref='user', lazy=True)
 
     def toDict(self):
         return{
@@ -33,21 +32,20 @@ class User(db.Model):
         return '<User {}>'.format(self.name)
 
 class MyIngredients(db.Model):
-    iid = db.Column('iid', db.Integer, primary_key=True)
+    iid = db.Column(db.Integer, primary_key=True)
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'), nullable=False)
-    rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'), nullable=False)
+    #rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'), nullable=False)
     name = db.Column(db.String(180))
-    recipe = db.relationship('MyRecipes')
+    #recipe = db.relationship('MyRecipes')
 
     def toDict(self):
         return{
-            'id':self.id,
-            'userid':self.userid,
+            'id':self.iid,
             'name':self.name
         }
 
 class MyRecipes(db.Model):
-    rid= db.Column(db.Integer, primary_key=True)
+    rid = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(120), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
