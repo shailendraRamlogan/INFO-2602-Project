@@ -25,15 +25,11 @@ function displayRecipes(records){
   data = document.querySelector('#recipes');
   data.innerHTML = ``;
   for (i=0;i<10;i++){
-    let ringredients={
-      'key':[],
-      'text':[]
-    }
+    let ringredients=[];
     let ingredients = records[i].recipe.ingredients;
     let count = ingredients.length;
     for(let i=0;i<count;i++){
-      ringredients.key.push(i);
-      ringredients.text.push(ingredients[i].text);
+      ringredients.push(ingredients[i].text)
     }
     data.innerHTML += `
       <div class="recipe">
@@ -43,7 +39,7 @@ function displayRecipes(records){
       <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
       <p>Health Labels: ${records[i].recipe.healthLabels}</p>
       <div class="btns">
-      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ringredients.text}')">Save Dish</button>
+      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ringredients}')">Save Dish</button>
       <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
       <button>View Ingredients</button>
       </div>
@@ -199,12 +195,12 @@ function recipeSubmit(name, url, ingredients){
     recipe: url,
     ingredients: ingredients
   }
-  //addRecipe(`${server}/recipe`, data);
+  addRecipe(`${server}/recipe`, data);
   console.log(data);
 }
 
 async function addRecipe(url, data){
-  let token=sessionStorage.getItem("access_token");
+  let token=localStorage.getItem("access_token");
   try{
     let response =await fetch(
       url,
