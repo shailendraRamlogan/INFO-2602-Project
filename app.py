@@ -40,7 +40,7 @@ def identity(payload):
 jwt = JWT(app, authenticate, identity)
 
 @app.route('/')
-#@jwt_required()
+@jwt_required()
 def hello():
     return app.send_static_file('index.html')
 
@@ -101,6 +101,47 @@ def deleteIngredient():
     db.session.commit()
     return name + ' successfully removed.',202
 
+
+@app.route('/recipe', methods=['POST'])
+@jwt_required()
+def addRecipe():
+    userdata = request.get_json()
+    recipe = MyRecipes(name=userdata['name'], id=current_identity.id, recipe=userdata['recipe'], ingredients=userdata['ingredients'])
+    try:
+        db.session.add(recipe)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return 'Recipe already added. Please view in the Recipe tab.', 401
+    return 'Recipe ' + recipe.name+' added.', 201
+
+@app.route('/recipe', methods=['GET'])
+@jwt_required()
+def getRecipes():
+    recipes= MyRecipes.query.filter_by(id=current_identity.id).all()
+    recipes = [recipe.toDict() for recipe in recipes]
+    if recipes == None:
+        return 'No recipes added.',200
+    return json.dumps(recipes), 200
+
+@app.route('/recipe/<rid>', methods=['GET'])
+@jwt_required()
+def getRecipe(rid):
+    recipe = MyRecipes.query.filter_by(id=current_identity.id, rid=rid).first()
+    if recipe == None:
+        return 'No recipe captured.', 403
+    return json.dumps(recipe.toDict()), 201
+
+@app.route('/recipe/<rid>', methods=['DELETE'])
+@jwt_required()
+def deleteRecipe(rid):
+    recipe = MyRecipes.query.filter_by(id=current_identity.id, rid=rid).first()
+    name= recipe.name
+    if recipe == None:
+        return 'No recipe captured.', 403
+    db.session.delete(recipe)
+    db.session.commit()
+    return name + ' successfully removed.',202
 
 
 if __name__ == '__main__':
