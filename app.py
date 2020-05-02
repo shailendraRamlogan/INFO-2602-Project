@@ -5,7 +5,7 @@ from flask_jwt import JWT, jwt_required, current_identity
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta 
 
-from models import db, User, MyIngredients
+from models import db, User, MyIngredients, MyRecipes
 
 login_manager = LoginManager()
 @login_manager.user_loader
@@ -66,22 +66,18 @@ def signup():
 def add_ingredient():
     userdata = request.get_json()
     ingredient = MyIngredients(name=userdata['name'], id=current_identity.id)
-    try:
-        db.session.add(ingredient)
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        return 'Ingredient already added.', 401
+    db.session.add(ingredient)
+    db.session.commit()
     return ingredient.name + ' added.', 201
 
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()
 def getIngredients():
-  ingredients = MyIngredients.query.filter_by(id=current_identity.id).all()
-  ingredients = [ingredient.toDict() for ingredient in ingredients]
-  if ingredients == None:
-    return 'There are currently no ingredients added to your list.', 200
-  return json.dumps(ingredients), 200
+    ingredients = MyIngredients.query.filter_by(id=current_identity.id).all()
+    ingredients = [ingredient.toDict() for ingredient in ingredients]
+    if ingredients == None:
+        return 'There are currently no ingredients added to your list.', 200
+    return json.dumps(ingredients), 200
 
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()
@@ -90,7 +86,7 @@ def getIngredient():
     name = userdata['name']
     ingredient = MyIngredients.query.filter_by(id=current_identity.id, name=name).first()
     if ingredient == None:
-        return 'No ingredient with that name exists.'
+        return 'No ingredient found.'
     return json.dumps(ingredient.toDict()),200
 
 @app.route('/ingredients', methods=['DELETE'])

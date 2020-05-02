@@ -37,7 +37,7 @@ async function logIn(url, data){
     message=JSON.parse(result);
     if(message.hasOwnProperty('access_token')){
       token=message.access_token;
-      console.log(token);
+      // console.log(token);
       homePage(server, token);
     }else{
       alert(result);//3. Do something with the message
@@ -61,7 +61,7 @@ async function homePage(url, token){
       },
     );
     let result=await response;
-    console.log(result);
+    // console.log(result);
     window.location.replace(result.url);
   }catch(e){
     console.log(e);

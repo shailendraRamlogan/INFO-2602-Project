@@ -42,21 +42,35 @@
         margin: 20px;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
+        /* justify-content: space-around; */
         background: white;
         align-items: center;
         min-width: 40%;
+        height: 300px;
       }
 
       .image{
-        border-radius: 50%;
-        width: 100px;
-        height: 100px;  
+        margin-top: 2px;
+        border-radius: 20%;
+        width: 160px;
+        height: 120px;
+        margin-bottom: 10px;
       }
 
       li {
         list-style: none;
         font-weight: 500;
+      }
+      
+      .btns{
+        margin-top: 20px;
+        display: inline;
+      }
+      p{
+        margin: 2px;
+      }
+      h2{
+        margin: 5px;
       }
     </style>
   </head>
@@ -87,7 +101,7 @@
       try{
         let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
         let data = await response.json();
-        displayRecipies(data.hits);
+        displayRecipes(data.hits);
         console.log(data.hits);
       }
       catch(e){
@@ -95,16 +109,27 @@
       }
     }
 
-    function displayRecipies(records){
+    function goTo(link){
+      window.open(link);
+    }
+
+    function displayRecipes(records){
       data = document.querySelector('#recipes');
       data.innerHTML = ``;
       for (i=0; i<10;i++){
         //let ingredients = records[i].recipe.ingredients;
         data.innerHTML += `
           <div class="recipe">
-          <h1>${records[i].recipe.label}</h1>
-          <p>Calories : ${records[i].recipe.calories}<p>
+          <h2>${records[i].recipe.label}</h2>
           <img class="image" src="${records[i].recipe.image}"/>
+          <p>Cautions: ${records[i].recipe.cautions}</p>
+          <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
+          <p>Health Labels: ${records[i].recipe.healthLabels}</p>
+          <div class="btns">
+          <button>Save Dish</button>
+          <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
+          <button>View Ingredients</button>
+          </div>
           </div>
         `;
         // or (ingredient in ingredients){
@@ -117,7 +142,6 @@
         //data.innerHTML +=`</div>`
       }
     }
-
 
     function setSearch(e){
       search = e.target.value;

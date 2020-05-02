@@ -31,12 +31,23 @@ class User(db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.name)
 
-class MyIngredients(db.Model):
+class Ingredient(db.Model):
     iid = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30))
+
+    def toDict(self):
+        return{
+            'id':self.iid,
+            'name':self.name
+        }
+
+class MyIngredients(db.Model):
+    mid = db.Column(db.Integer, primary_key=True)
+    iid = db.Column('iid', db.Integer, db.ForeignKey('Ingredient.iid'))
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'), nullable=False)
-    #rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'), nullable=False)
+    rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'), nullable=False)
     name = db.Column(db.String(180))
-    #recipe = db.relationship('MyRecipes')
+    recipe = db.relationship('MyRecipes')
 
     def toDict(self):
         return{
@@ -47,7 +58,9 @@ class MyIngredients(db.Model):
 class MyRecipes(db.Model):
     rid = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    mid = db.Column(db.Integer, db.ForeignKey('myingredients.mid'), nullable=True)
     name = db.Column(db.String(120), nullable=False)
+    recipe = db.Column(db.String(255), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
 
     def toDict(self):
@@ -55,5 +68,6 @@ class MyRecipes(db.Model):
             'rid':self.rid,
             'id':self.id,
             'name':self.name,
+            'recipe':self.recipe,
             'ingredients': self.ingredients
         }
