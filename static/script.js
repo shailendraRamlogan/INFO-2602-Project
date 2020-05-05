@@ -4,6 +4,7 @@ const appID = '09922bc4';
 const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
 let query = '';
 let search = '';
+let recipes=[{}];
 
 async function signUp(url, data){
   try{ 
@@ -118,8 +119,13 @@ async function getRecipes(){
   try{
     let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
     let data = await response.json();
-    displayRecipes(data.hits);
-    console.log(data.hits);
+    for(let i=0;i<data.hits.length;i++){
+      recipes['id'].push(data.hits[i].recipe.label);
+      recipes['recipe'].push(data.hits[i].recipe);
+    }
+    //displayRecipes(recipes);
+    //console.log(data.hits);
+    console.log(recipes);
   }
   catch(e){
     console.log(e);
@@ -247,7 +253,7 @@ async function addIngred(url, data){
 }
 
 function parseIng(ingredients){
-  
+
 }
 
 document.forms['signup'].addEventListener('submit',signUpSubmit);
