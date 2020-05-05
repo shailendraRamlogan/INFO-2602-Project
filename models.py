@@ -33,12 +33,14 @@ class User(db.Model):
 
 class Ingredient(db.Model):
     iid = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String(30), nullable=False)
+    unit = db.Column(db.String(80), nullable=False)
 
     def toDict(self):
         return{
             'id':self.iid,
-            'name':self.name
+            'name':self.name,
+            'unit':self.unit
         }
 
 class MyIngredients(db.Model):
@@ -47,12 +49,13 @@ class MyIngredients(db.Model):
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'), nullable=False)
     #rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'), nullable=False)
     name = db.Column(db.String(180))
-    #recipe = db.relationship('MyRecipes')
+    quantity = db.Column(db.Integer, nullable=False)
 
     def toDict(self):
         return{
             'id':self.iid,
-            'name':self.name
+            'name':self.name,
+            'quantity':self.quantity
         }
 
 class MyRecipes(db.Model):

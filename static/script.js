@@ -2,60 +2,8 @@ let url='http://127.0.0.1:8080';
 let server='http://127.0.0.1:8080';
 const appID = '09922bc4';
 const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
-var query = '';
-var search = '';
-
-async function getRecipes(){
-  try{
-    let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
-    let data = await response.json();
-    displayRecipes(data.hits);
-    console.log(data.hits);
-  }
-  catch(e){
-    console.log(e);
-  }
-}
-
-function goTo(link){
-  window.open(link);
-}
-
-function displayRecipes(records){
-  data = document.querySelector('#recipes');
-  data.innerHTML = ``;
-  for (i=0;i<10;i++){
-    let ringredients=[];
-    let ingredients = records[i].recipe.ingredients;
-    let count = ingredients.length;
-    for(let i=0;i<count;i++){
-      ringredients.push(ingredients[i].text)
-    }
-    data.innerHTML += `
-      <div class="recipe">
-      <h2>${records[i].recipe.label}</h2>
-      <img class="image" src="${records[i].recipe.image}"/>
-      <p>Cautions: ${records[i].recipe.cautions}</p>
-      <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
-      <p>Health Labels: ${records[i].recipe.healthLabels}</p>
-      <div class="btns">
-      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ringredients}')">Save Dish</button>
-      <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
-      <button>View Ingredients</button>
-      </div>
-      </div>
-    `;
-  }
-}
-
-function setSearch(e){
-  search = e.target.value;
-}
-function getSearch(e){
-  e.preventDefault();
-  query = search;
-  getRecipes();
-}
+let query = '';
+let search = '';
 
 async function signUp(url, data){
   try{ 
@@ -166,25 +114,57 @@ function logInSubmit(event){
     logIn(`${url}/auth`,data);
 }
 
-async function addIngred(url, data){
-  try{ 
-    let response = await fetch(
-      url, 
-      {
-        method: 'POST',
-        body: JSON.stringify(data),//convert data to JSON string
-        headers: { 'Content-Type':'application/json',
-                    'Authorization':`jwt ${token}`}// JSON data
-      },
-    );//1. Send http request and get response
-    
-    let result = await response.text();//2. Get message from response
-    alert(result);//3. Do something with the message
-    console.log(result);
-  }catch(error){
-    alert(error);
-    console.log(error);//catch and log any errors
+async function getRecipes(){
+  try{
+    let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
+    let data = await response.json();
+    displayRecipes(data.hits);
+    console.log(data.hits);
   }
+  catch(e){
+    console.log(e);
+  }
+}
+
+function goTo(link){
+  window.open(link);
+}
+
+function displayRecipes(records){
+  let res = document.querySelector('#recipes');
+  res.innerHTML = ``;
+  for (i=0;i<10;i++){
+    let ringredients=[];
+    let ingredients = records[i].recipe.ingredients;
+    let count = ingredients.length;
+    for(let i=0;i<count;i++){
+      ringredients.push(ingredients[i].text);
+    }
+    console.log(ringredients);
+    res.innerHTML += `
+      <div class="recipe" id="${records[i].recipe.label}">
+      <h2>${records[i].recipe.label}</h2>
+      <img class="image" src="${records[i].recipe.image}"/>
+      <p>Cautions: ${records[i].recipe.cautions}</p>
+      <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
+      <p>Health Labels: ${records[i].recipe.healthLabels}</p>
+      <div class="btns">
+      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ringredients}')">Save Dish</button>
+      <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
+      <button onclick="viewIngredients('${records[i].recipe.label}','${ringredients}')">View Ingredients</button>
+      </div>
+      </div>
+    `;
+  }
+}
+
+function setSearch(e){
+  search = e.target.value;
+}
+function getSearch(e){
+  e.preventDefault();
+  query = search;
+  getRecipes();
 }
 
 function recipeSubmit(name, url, ingredients){
@@ -218,6 +198,56 @@ async function addRecipe(url, data){
     alert(error);
     console.log(error);
   }
+}
+
+function viewIngredients(name,ingredients){
+  //window.location.href = `${server}/ingredients`;
+  displayIngredients(name,ingredients);
+}
+
+function displayIngredients(name,ingredients){
+  console.log(ingredients);
+  let res = document.getElementById(`${name}`);
+  res.innerHTML=`<h2>${name}</h2>`;
+  res.innerHTML+=`<p>${ingredients}</p>`;
+}
+
+async function getRecipeIngredients(name){
+  try{
+    let response = await fetch(`${server}/recipe/${name}`);
+    let data = await response.json();
+    //displayIngredients(data.ingredients);
+    console.log(data);
+  }
+  catch(e){
+    console.log(e);
+  }
+}
+
+async function addIngred(url, data){
+  let token=localStorage.getItem("access_token");
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'POST',
+        body: JSON.stringify(data),//convert data to JSON string
+        headers: { 'Content-Type':'application/json',
+                    'Authorization':`jwt ${token}`}// JSON data
+      },
+    );//1. Send http request and get response
+    
+    let result = await response.text();//2. Get message from response
+    alert(result);//3. Do something with the message
+    console.log(result);
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
+}
+
+function parseIng(ingredients){
+  
 }
 
 document.forms['signup'].addEventListener('submit',signUpSubmit);

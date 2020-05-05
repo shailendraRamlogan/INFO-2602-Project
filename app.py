@@ -40,8 +40,8 @@ def identity(payload):
 jwt = JWT(app, authenticate, identity)
 
 @app.route('/')
-@jwt_required()
-def hello():
+#@jwt_required()
+def main():
     return app.send_static_file('index.html')
 
 @app.route('/register')
@@ -61,9 +61,14 @@ def signup():
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
 
+@app.route('/ingredients')
+#@jwt_required()
+def ingredients():
+    return render_template('ingredients.html')
+
 @app.route('/ingredients', methods=['POST'])
 @jwt_required()
-def add_ingredient():
+def addIngredient():
     userdata = request.get_json()
     ingredient = MyIngredients(name=userdata['name'], id=current_identity.id)
     db.session.add(ingredient)
@@ -124,10 +129,10 @@ def getRecipes():
         return 'No recipes added.',200
     return json.dumps(recipes), 200
 
-@app.route('/recipe/<rid>', methods=['GET'])
+@app.route('/recipe/<name>', methods=['GET'])
 @jwt_required()
-def getRecipe(rid):
-    recipe = MyRecipes.query.filter_by(id=current_identity.id, rid=rid).first()
+def getRecipe(name):
+    recipe = MyRecipes.query.filter_by(id=current_identity.id, name=name).first()
     if recipe == None:
         return 'No recipe captured.', 403
     return json.dumps(recipe.toDict()), 201
