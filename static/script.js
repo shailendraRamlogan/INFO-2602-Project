@@ -4,7 +4,7 @@ const appID = '09922bc4';
 const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
 let query = '';
 let search = '';
-let recipes=[{}];
+let recipes=[];
 
 async function signUp(url, data){
   try{ 
@@ -120,11 +120,18 @@ async function getRecipes(){
     let response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${appID}&app_key=${appKey}`);
     let data = await response.json();
     for(let i=0;i<data.hits.length;i++){
-      recipes['id'].push(data.hits[i].recipe.label);
-      recipes['recipe'].push(data.hits[i].recipe);
+      let id=data.hits[i].recipe.label;
+      let recipe=data.hits[i].recipe;
+      let ringredients=[];
+      let ingredients = data.hits[i].recipe.ingredients;
+      let count = ingredients.length;
+      for(let i=0;i<count;i++){
+        ringredients.push(ingredients[i].text);
+      }
+      let obj={"id":id, "recipe":recipe, "ingredients":ringredients};
+      recipes.push(obj);
     }
-    //displayRecipes(recipes);
-    //console.log(data.hits);
+    displayRecipes(recipes);
     console.log(recipes);
   }
   catch(e){
@@ -139,14 +146,8 @@ function goTo(link){
 function displayRecipes(records){
   let res = document.querySelector('#recipes');
   res.innerHTML = ``;
-  for (i=0;i<10;i++){
-    let ringredients=[];
-    let ingredients = records[i].recipe.ingredients;
-    let count = ingredients.length;
-    for(let i=0;i<count;i++){
-      ringredients.push(ingredients[i].text);
-    }
-    console.log(ringredients);
+  for (i=0;i<records.length;i++){
+    let ingredients=records[i].ingredients;
     res.innerHTML += `
       <div class="recipe" id="${records[i].recipe.label}">
       <h2>${records[i].recipe.label}</h2>
@@ -155,9 +156,9 @@ function displayRecipes(records){
       <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
       <p>Health Labels: ${records[i].recipe.healthLabels}</p>
       <div class="btns">
-      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ringredients}')">Save Dish</button>
+      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ingredients}')">Save Dish</button>
       <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
-      <button onclick="viewIngredients('${records[i].recipe.label}','${ringredients}')">View Ingredients</button>
+      <button onclick="viewIngredients('${records[i].recipe.label}')">View Ingredients</button>
       </div>
       </div>
     `;
@@ -168,6 +169,7 @@ function setSearch(e){
   search = e.target.value;
 }
 function getSearch(e){
+  recipes=[];
   e.preventDefault();
   query = search;
   getRecipes();
@@ -206,16 +208,49 @@ async function addRecipe(url, data){
   }
 }
 
-function viewIngredients(name,ingredients){
+function viewIngredients(name){
   //window.location.href = `${server}/ingredients`;
-  displayIngredients(name,ingredients);
+  displayIngredients(name);
 }
 
-function displayIngredients(name,ingredients){
-  console.log(ingredients);
+function displayIngredients(name){
   let res = document.getElementById(`${name}`);
+  res.innerHTML=``;
   res.innerHTML=`<h2>${name}</h2>`;
-  res.innerHTML+=`<p>${ingredients}</p>`;
+  let ingredients=[];
+  for(let i=0;i<recipes.length;i++){
+    if(recipes[i].id===name){
+      ingredients=recipes[i].ingredients;
+    }
+  }
+  for(let i=0;i<ingredients.length;i++){
+    res.innerHTML+=`<p>${ingredients[i]}</p>`;
+  }
+  res.innerHTML+=`<div id="ibtns">
+                    <button onclick="reDraw('${name}')">Back</button>
+                  </div>`;
+}
+
+function reDraw(name){
+  let res=document.getElementById(`${name}`);
+  res.innerHTML=``;
+  for(let i=0;i<recipes.length;i++){
+    if(recipes[i].id==name){
+      let ingredients=recipes[i].ingredients;
+      res.innerHTML += `
+      <h2>${recipes[i].recipe.label}</h2>
+      <img class="image" src="${recipes[i].recipe.image}"/>
+      <p>Cautions: ${recipes[i].recipe.cautions}</p>
+      <p>Diet Labels: ${recipes[i].recipe.dietLabels}</p>
+      <p>Health Labels: ${recipes[i].recipe.healthLabels}</p>
+      <div class="btns">
+      <button onclick="recipeSubmit('${recipes[i].recipe.label}','${recipes[i].recipe.url}','${ingredients}')">Save Dish</button>
+      <button onclick="goTo('${recipes[i].recipe.url}')">View Recipe</button>
+      <button onclick="viewIngredients('${recipes[i].recipe.label}')">View Ingredients</button>
+      </div>
+    `;
+    }
+  }
 }
 
 async function getRecipeIngredients(name){
