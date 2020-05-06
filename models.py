@@ -41,11 +41,6 @@ class Ingredient(db.Model):
             'name':self.name,
         }
 
-links = db.Table('links',
-        db.Column('mid', db.Integer, db.ForeignKey('myingredients.mid')),
-        db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'))
-        )
-
 class MyIngredients(db.Model):
     mid = db.Column(db.Integer, primary_key=True)
     iid = db.Column('iid', db.Integer, db.ForeignKey('ingredient.iid'))
@@ -53,7 +48,6 @@ class MyIngredients(db.Model):
     rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'))
     name = db.Column(db.String(180))
     quantity = db.Column(db.Integer, nullable=False)
-    recipes = db.relationship('MyRecipes')
 
     def toDict(self):
         return{
@@ -69,7 +63,6 @@ class MyRecipes(db.Model):
     name = db.Column(db.String(120),  unique=True, nullable=False)
     recipe = db.Column(db.String(255), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
-    myingredients = db.relationship('MyIngredients', secondary = links, backref=db.backref('recipes', lazy='dynamic'))
 
     def toDict(self):
         return{
