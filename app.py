@@ -5,7 +5,7 @@ from flask_jwt import JWT, jwt_required, current_identity
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta 
 
-from models import db, User, MyIngredients, MyRecipes
+from models import db, User, Ingredient, Recipe, UserIngredient#, IngredientRecipe
 
 login_manager = LoginManager()
 @login_manager.user_loader
@@ -61,16 +61,16 @@ def signup():
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
 
-@app.route('/myingredients')
-@jwt_required()
-def ingredients():
-    return render_template('ingredients.html')
+# @app.route('/myingredients')
+# @jwt_required()
+# def ingredients():
+#     return render_template('ingredients.html')
 
 @app.route('/ingredients', methods=['POST'])
 @jwt_required()
 def addIngredient():
     userdata = request.get_json()
-    ingredient = MyIngredients(name=userdata['name'], id=current_identity.id)
+    ingredient = UserIngredient(name=userdata['name'], id=current_identity.id, quantity=userdata['num'])
     db.session.add(ingredient)
     db.session.commit()
     return ingredient.name + ' added.', 201
@@ -78,7 +78,7 @@ def addIngredient():
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()
 def getIngredients():
-    ingredients = MyIngredients.query.filter_by(id=current_identity.id).all()
+    ingredients = UserIngredient.query.filter_by(id=current_identity.id).all()
     ingredients = [ingredient.toDict() for ingredient in ingredients]
     if ingredients == None:
         return 'There are currently no ingredients added to your list.', 200
@@ -89,7 +89,7 @@ def getIngredients():
 def getIngredient():
     userdata= request.get_json()
     name = userdata['name']
-    ingredient = MyIngredients.query.filter_by(id=current_identity.id, name=name).first()
+    ingredient = UserIngredient.query.filter_by(id=current_identity.id, name=name).first()
     if ingredient == None:
         return 'No ingredient found.'
     return json.dumps(ingredient.toDict()),200
@@ -99,7 +99,7 @@ def getIngredient():
 def deleteIngredient():
     userdata=request.get_json()
     name = userdata['name']
-    ingredient = MyIngredients.query.filter_by(id=current_identity.id, name=name).first()
+    ingredient = UserIngredient.query.filter_by(id=current_identity.id, name=name).first()
     if ingredient == None:
         return 'No ingredient named '+name, 403
     db.session.delete(ingredient)
@@ -111,7 +111,7 @@ def deleteIngredient():
 @jwt_required()
 def addRecipe():
     userdata = request.get_json()
-    recipe = MyRecipes(name=userdata['name'], id=current_identity.id, recipe=userdata['recipe'], ingredients=userdata['ingredients'])
+    recipe = Recipe(name=userdata['name'], id=current_identity.id, recipeUrl=userdata['recipeUrl'], ingredients=userdata['ingredients'])
     try:
         db.session.add(recipe)
         db.session.commit()
@@ -123,7 +123,7 @@ def addRecipe():
 @app.route('/recipe', methods=['GET'])
 @jwt_required()
 def getRecipes():
-    recipes= MyRecipes.query.filter_by(id=current_identity.id).all()
+    recipes= Recipe.query.filter_by(id=current_identity.id).all()
     recipes = [recipe.toDict() for recipe in recipes]
     if recipes == None:
         return 'No recipes added.',200
@@ -132,15 +132,15 @@ def getRecipes():
 @app.route('/recipe/<name>', methods=['GET'])
 @jwt_required()
 def getRecipe(name):
-    recipe = MyRecipes.query.filter_by(id=current_identity.id, name=name).first()
+    recipe = Recipe.query.filter_by(id=current_identity.id, name=name).first()
     if recipe == None:
         return 'No recipe captured.', 403
     return json.dumps(recipe.toDict()), 201
 
-@app.route('/recipe/<rid>', methods=['DELETE'])
+@app.route('/recipe/<name>', methods=['DELETE'])
 @jwt_required()
-def deleteRecipe(rid):
-    recipe = MyRecipes.query.filter_by(id=current_identity.id, rid=rid).first()
+def deleteRecipe(name):
+    recipe = Recipe.query.filter_by(id=current_identity.id, name=name).first()
     name= recipe.name
     if recipe == None:
         return 'No recipe captured.', 403

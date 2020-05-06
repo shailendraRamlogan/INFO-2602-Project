@@ -180,7 +180,7 @@ function recipeSubmit(name, url, ingredients){
       
   let data = {
     name: name,
-    recipe: url,
+    recipeUrl: url,
     ingredients: ingredients
   }
   addRecipe(`${server}/recipe`, data);
