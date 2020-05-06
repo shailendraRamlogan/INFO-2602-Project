@@ -61,8 +61,8 @@ def signup():
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
 
-@app.route('/ingredients')
-#@jwt_required()
+@app.route('/myingredients')
+@jwt_required()
 def ingredients():
     return render_template('ingredients.html')
 

@@ -34,22 +34,26 @@ class User(db.Model):
 class Ingredient(db.Model):
     iid = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
-    unit = db.Column(db.String(80), nullable=False)
 
     def toDict(self):
         return{
             'id':self.iid,
             'name':self.name,
-            'unit':self.unit
         }
+
+links = db.Table('links',
+        db.Column('mid', db.Integer, db.ForeignKey('myingredients.mid')),
+        db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'))
+        )
 
 class MyIngredients(db.Model):
     mid = db.Column(db.Integer, primary_key=True)
     iid = db.Column('iid', db.Integer, db.ForeignKey('ingredient.iid'))
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'), nullable=False)
-    #rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'), nullable=False)
+    rid = db.Column('rid', db.Integer, db.ForeignKey('myrecipes.rid'))
     name = db.Column(db.String(180))
     quantity = db.Column(db.Integer, nullable=False)
+    recipes = db.relationship('MyRecipes')
 
     def toDict(self):
         return{
@@ -61,10 +65,11 @@ class MyIngredients(db.Model):
 class MyRecipes(db.Model):
     rid = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    #mid = db.Column(db.Integer, db.ForeignKey('myingredients.mid'), nullable=True)
+    mid = db.Column(db.Integer, db.ForeignKey('myingredients.mid'), nullable=True)
     name = db.Column(db.String(120),  unique=True, nullable=False)
     recipe = db.Column(db.String(255), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
+    myingredients = db.relationship('MyIngredients', secondary = links, backref=db.backref('recipes', lazy='dynamic'))
 
     def toDict(self):
         return{
@@ -72,5 +77,6 @@ class MyRecipes(db.Model):
             'id':self.id,
             'name':self.name,
             'recipe':self.recipe,
-            'ingredients': self.ingredients
+            'ingredients': self.ingredients,
+            'myingredients':self.myingredients
         }
