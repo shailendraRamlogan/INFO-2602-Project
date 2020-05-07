@@ -51,10 +51,9 @@ async function logIn(url, data){
       },
     );//1. Send http request and get response
     
-    let result = await response.text();//2. Get message from response
-    let message=JSON.parse(result);
-    if(message.hasOwnProperty('access_token')){
-      localStorage.setItem("access_token",message.access_token);
+    let result = await response.json();//2. Get message from response
+    if(result.hasOwnProperty('access_token')){
+      localStorage.setItem("access_token",result.access_token);
       let token = localStorage.getItem("access_token");
       homePage(`${server}/home`, token);
     }else{
@@ -79,7 +78,6 @@ async function homePage(url, token){
       },
     );
     let result=await response;
-    // console.log(result);
     window.location.replace(result.url);
     console.log(token);
   }catch(e){
@@ -225,11 +223,6 @@ async function addRecipe(url, data){
 }
 
 function viewIngredients(name){
-  //window.location.href = `${server}/ingredients`;
-  displayIngredients(name);
-}
-
-function displayIngredients(name){
   let res = document.getElementById(`${name}`);
   res.innerHTML=``;
   res.innerHTML=`<h2>${name}</h2>`;
@@ -273,7 +266,28 @@ function reDraw(name){
   }
 }
 
-async function getRecipeIngredients(name){
+async function getRecipeList(){
+  let url=`${server}/recipe`;
+  let token=localStorage.getItem("access_token");
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response.json();
+    console.log(result);
+    console.log(token);
+  }catch(e){
+    console.log(e);
+  }
+}
+
+
+async function getRecipe(name){
   try{
     let response = await fetch(`${server}/recipe/${name}`);
     let data = await response.json();
@@ -307,8 +321,91 @@ async function addIngred(url, data){
   }
 }
 
+async function getIngredientList(){
+  let url=`${server}/ingredients`;
+  let token=localStorage.getItem("access_token");
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response.json();
+    console.log(result);
+    console.log(token);
+  }catch(e){
+    console.log(e);
+  }
+}
+
 function parseIng(ingredients){
 
+}
+
+async function home(){
+  let url=`${server}/home`;
+  let token = localStorage.getItem("access_token");
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response;
+    //console.log(result);
+    window.location.href=`${result.url}`;
+  }catch(e){
+    console.log(e);
+  }
+}
+
+async function myRecipes(){
+  let url = `${server}/myrecipes`;
+  let token = localStorage.getItem("access_token");
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response;
+    window.location.href=`${result.url}`;
+  }catch(e){
+    console.log(e);
+  }
+}
+
+async function myIngredients(){
+  let url = `${server}/myingredients`;
+  let token = localStorage.getItem("access_token");
+  try{ 
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response;
+    window.location.replace(result.url);
+  }catch(e){
+    console.log(e);
+  }
+}
+
+function logout(){
+  localStorage.removeItem("access_token");
+  window.location.replace(server);
 }
 
 document.forms['signup'].addEventListener('submit',signUpSubmit);

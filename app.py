@@ -44,7 +44,7 @@ def register():
     return render_template('signup.html')
 
 @app.route('/home')
-#@jwt_required()
+@jwt_required()
 def main():
     return app.send_static_file('index.html')
 
@@ -61,10 +61,10 @@ def signup():
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
 
-# @app.route('/myingredients')
-# @jwt_required()
-# def ingredients():
-#     return render_template('ingredients.html')
+@app.route('/myingredients')
+#@jwt_required()
+def ingredients():
+    return render_template('ingredients.html')
 
 @app.route('/ingredients', methods=['POST'])
 @jwt_required()
@@ -106,6 +106,10 @@ def deleteIngredient():
     db.session.commit()
     return name + ' successfully removed.',202
 
+@app.route('/myrecipes')
+#@jwt_required()
+def showRecipes():
+    return render_template('recipes.html')
 
 @app.route('/recipe', methods=['POST'])
 @jwt_required()

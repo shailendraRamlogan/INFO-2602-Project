@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Recipes</title>
+  <link rel="stylesheet" type="text/css" href="../static/style.css">
+</head>
+<body onload="getRecipeList()">
+  <header>
+    <div class="container">
+      <h1 class="logo"></h1>
+      <nav>
+        <ul>
+            <li><a onclick="home()">Home</a></li>
+            <li><a onclick="myRecipes()">My Recipes</a></li>
+            <li><a onclick="myIngredients()">My Ingredients</a></li>
+            <li><a onclick="logout()">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div id="list" class="row">
+    <aside class="col s0 m3" >
+      <div class="collection" id="listing">
+        
+      </div>
+    </aside>
+    <article class="col m9" id="result">
+      
+    </article>
+</div>
+<script src="../static/script.js" type="text/javascript"></script>
+</body>
+</html>
