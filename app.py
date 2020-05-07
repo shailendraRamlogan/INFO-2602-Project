@@ -40,13 +40,13 @@ def identity(payload):
 jwt = JWT(app, authenticate, identity)
 
 @app.route('/')
+def register():
+    return render_template('signup.html')
+
+@app.route('/home')
 #@jwt_required()
 def main():
     return app.send_static_file('index.html')
-
-@app.route('/register')
-def register():
-    return render_template('signup.html') 
 
 @app.route('/signup', methods=['POST'])
 def signup():

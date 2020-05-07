@@ -62,22 +62,20 @@ class UserIngredient(db.Model):
     iid = db.Column('iid', db.Integer, db.ForeignKey('ingredient.iid'))
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(180))
-    quantity = db.Column(db.Integer, nullable=False)
 
     def toDict(self):
         return{
             'id':self.iid,
             'name':self.name,
-            'quantity':self.quantity
         }
 
-class IngredientRecipe(db.Model):
-    irid = db.Column(db.Integer, primary_key=True)
-    pid = db.Column('pid', db.Integer, db.ForeignKey('useringredient.pid'))
-    rid = db.Column('rid', db.Integer, db.ForeignKey('recipe.rid'))
-    recipe = db.relationship('Recipe')
+# class IngredientRecipe(db.Model):
+#     irid = db.Column(db.Integer, primary_key=True)
+#     pid = db.Column('pid', db.Integer, db.ForeignKey('useringredient.pid'))
+#     rid = db.Column('rid', db.Integer, db.ForeignKey('recipe.rid'))
+#     recipe = db.relationship('Recipe')
 
-    def toDict(self):
-        return{
-            'recipes':self.recipe.toDict()
-        }
+#     def toDict(self):
+#         return{
+#             'recipes':self.recipe.toDict()
+#         }

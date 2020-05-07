@@ -5,6 +5,21 @@ const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
 let query = '';
 let search = '';
 let recipes=[];
+let x= document.getElementById("signup");
+let y= document.getElementById("login");
+let z= document.getElementById("btn");
+
+function login(){
+  x.style.left= "-400px";
+  y.style.left= "50px";
+  z.style.left= "110px";
+}
+
+function signup(){
+  x.style.left= "50px";
+  y.style.left= "450px";
+  z.style.left= "0px";
+}
 
 async function signUp(url, data){
   try{ 
@@ -41,7 +56,7 @@ async function logIn(url, data){
     if(message.hasOwnProperty('access_token')){
       localStorage.setItem("access_token",message.access_token);
       let token = localStorage.getItem("access_token");
-      homePage(server, token);
+      homePage(`${server}/home`, token);
     }else{
       alert(result);//3. Do something with the message
       console.log(result);
@@ -158,7 +173,7 @@ function displayRecipes(records){
       <div class="btns">
       <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ingredients}')">Save Dish</button>
       <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
-      <button onclick="viewIngredients('${records[i].recipe.label}')">View Ingredients</button>
+      <button onclick="viewIngredients('${records[i].id}')">View Ingredients</button>
       </div>
       </div>
     `;
@@ -202,6 +217,7 @@ async function addRecipe(url, data){
     let result = await response.text();
     alert(result);
     console.log(result);
+    console.log(token);
   }catch(error) {
     alert(error);
     console.log(error);
@@ -218,16 +234,20 @@ function displayIngredients(name){
   res.innerHTML=``;
   res.innerHTML=`<h2>${name}</h2>`;
   let ingredients=[];
+  let url='';
   for(let i=0;i<recipes.length;i++){
     if(recipes[i].id===name){
       ingredients=recipes[i].ingredients;
+      url=recipes[i].recipe.url;
     }
   }
   for(let i=0;i<ingredients.length;i++){
     res.innerHTML+=`<p>${ingredients[i]}</p>`;
   }
-  res.innerHTML+=`<div id="ibtns">
-                    <button onclick="reDraw('${name}')">Back</button>
+  res.innerHTML+=`<div class="btns">
+                    <button onclick="compareIngredients('${name}')">Compare Ingredients</button>
+                    <button onclick="goTo('${url}')">View Recipe</button>
+                    <button onclick="reDraw('${name}')">View Info</button>
                   </div>`;
 }
 
