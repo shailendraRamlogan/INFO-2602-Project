@@ -1,17 +1,10 @@
 import json
-from flask_login import LoginManager, current_user, login_user, login_required
 from flask import Flask, request, render_template, redirect, flash, url_for
 from flask_jwt import JWT, jwt_required, current_identity
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta 
 
 from models import db, User, Ingredient, Recipe, UserIngredient#, IngredientRecipe
-
-login_manager = LoginManager()
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
-
 
 def create_app():
     app = Flask(__name__)
@@ -44,7 +37,7 @@ def register():
     return render_template('signup.html')
 
 @app.route('/home')
-@jwt_required()
+#@jwt_required()
 def main():
     return app.send_static_file('index.html')
 
@@ -60,6 +53,7 @@ def signup():
         db.session.rollback()
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
+    
 
 @app.route('/myingredients')
 #@jwt_required()

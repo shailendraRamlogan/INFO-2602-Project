@@ -53,11 +53,11 @@ async function logIn(url, data){
     
     let result = await response.json();//2. Get message from response
     if(result.hasOwnProperty('access_token')){
-      localStorage.setItem("access_token",result.access_token);
-      let token = localStorage.getItem("access_token");
+      window.localStorage.setItem("access_token",result.access_token);
+      let token = window.localStorage.getItem("access_token");
       homePage(`${server}/home`, token);
     }else{
-      alert(result);//3. Do something with the message
+      alert(result.description);//3. Do something with the message
       console.log(result);
     }
   }catch(error){
@@ -72,7 +72,6 @@ async function homePage(url, token){
       url, 
       {
         method: 'GET',
-        body: null,//convert data to JSON string
         headers: {'Content-Type':'application/json',
                   'Authorization':`jwt ${token}`}// JSON data
       },
@@ -163,7 +162,7 @@ function displayRecipes(records){
     let ingredients=records[i].ingredients;
     res.innerHTML += `
       <div class="recipe" id="${records[i].recipe.label}">
-      <h2>${records[i].recipe.label}</h2>
+      <h3>${records[i].recipe.label}</h3>
       <img class="image" src="${records[i].recipe.image}"/>
       <p>Cautions: ${records[i].recipe.cautions}</p>
       <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
@@ -201,7 +200,7 @@ function recipeSubmit(name, url, ingredients){
 }
 
 async function addRecipe(url, data){
-  let token=localStorage.getItem("access_token");
+  let token=window.localStorage.getItem("access_token");
   try{
     let response =await fetch(
       url,
@@ -268,8 +267,8 @@ function reDraw(name){
 
 async function getRecipeList(){
   let url=`${server}/recipe`;
-  let token=localStorage.getItem("access_token");
   try{ 
+    let token=window.localStorage.getItem("access_token");
     let response = await fetch(
       url, 
       {
@@ -280,28 +279,64 @@ async function getRecipeList(){
     );
     let result=await response.json();
     console.log(result);
+    drawList(result);
     console.log(token);
   }catch(e){
     console.log(e);
   }
 }
 
+function drawList(recipes){
+  let res=document.querySelector('#listing');
+  res.innerHTML=`<h3>My Recipes</h3>`;
+  if(recipes.length==0){
+    res.innerHTML+=`<p>There are currently no recipes in your list.</p><br>
+                    <p>Go to the home tab to add recipes to view here.</p>`;
+  }else{
+    for(let i=0;i<recipes.length;i++){
+      res.innerHTML+=`<div id="recipe">
+                        <a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a><br>
+                      </div>`;
+    }
+  }
+}
+
 
 async function getRecipe(name){
-  try{
-    let response = await fetch(`${server}/recipe/${name}`);
-    let data = await response.json();
-    //displayIngredients(data.ingredients);
-    console.log(data);
-  }
-  catch(e){
+  let url=`${server}/recipe/${name}`;
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response.json();
+    console.log(result);
+    showRecipe(result);
+    console.log(token);
+  }catch(e){
     console.log(e);
   }
 }
 
+function showRecipe(recipe){
+  let res = document.querySelector('#canvas');
+  res.innerHTML='';
+  res.innerHTML+=`<div id="view">
+                    <h2>${recipe.name}</h2>
+                    <p>Recipe ID: ${recipe.rid}</p>
+                    <p>Recipe URL: ${recipe.recipe}</p>
+                    <p>Recipe Ingredients: ${recipe.ingredients}</p>
+                  </div>`;
+}
+
 async function addIngred(url, data){
-  let token=localStorage.getItem("access_token");
   try{ 
+    let token=window.localStorage.getItem("access_token");
     let response = await fetch(
       url, 
       {
@@ -323,8 +358,8 @@ async function addIngred(url, data){
 
 async function getIngredientList(){
   let url=`${server}/ingredients`;
-  let token=localStorage.getItem("access_token");
   try{ 
+    let token=window.localStorage.getItem("access_token");
     let response = await fetch(
       url, 
       {
@@ -335,10 +370,16 @@ async function getIngredientList(){
     );
     let result=await response.json();
     console.log(result);
+    showIngredients(result);
     console.log(token);
   }catch(e){
     console.log(e);
   }
+}
+
+function showIngredients(ingredients){
+  let res = document.querySelector('#ingredients');
+  res.innerHTML+=`<p>Ingredients Page</p>`;
 }
 
 function parseIng(ingredients){
@@ -347,64 +388,71 @@ function parseIng(ingredients){
 
 async function home(){
   let url=`${server}/home`;
-  let token = localStorage.getItem("access_token");
-  try{ 
-    let response = await fetch(
-      url, 
-      {
-        method: 'GET',
-        headers: {'Content-Type':'application/json',
-                  'Authorization':`jwt ${token}`}// JSON data
-      },
-    );
-    let result=await response;
-    //console.log(result);
-    window.location.href=`${result.url}`;
-  }catch(e){
-    console.log(e);
-  }
+  let token = window.localStorage.getItem("access_token");
+  var req = new XMLHttpRequest();
+  req.open('GET', url, true); //true means request will be async
+  req.onreadystatechange = function (aEvt) {
+    if (req.readyState == 4) {
+      if(req.status == 200){
+        window.location.href=url;
+      }
+        //update your page here
+        //req.responseText - is your result html or whatever you send as a response
+      else{
+        alert("Error loading page\n");
+      }
+    }
+  };
+  req.setRequestHeader('Authorization', `jwt ${token}`);
+  req.send();
 }
 
 async function myRecipes(){
   let url = `${server}/myrecipes`;
-  let token = localStorage.getItem("access_token");
-  try{ 
-    let response = await fetch(
-      url, 
-      {
-        method: 'GET',
-        headers: {'Content-Type':'application/json',
-                  'Authorization':`jwt ${token}`}// JSON data
-      },
-    );
-    let result=await response;
-    window.location.href=`${result.url}`;
-  }catch(e){
-    console.log(e);
-  }
+  let token = window.localStorage.getItem("access_token");
+  var req = new XMLHttpRequest();
+  req.open('HEAD', url); //true means request will be async
+  req.onreadystatechange = function (aEvt) {
+    if (req.readyState == 4) {
+      if(req.status == 200){
+        window.location.href=url;
+      }
+        //update your page here
+        //req.responseText - is your result html or whatever you send as a response
+      else{
+        alert("Error loading page\n");
+      }
+    }
+  };
+  req.setRequestHeader('Authorization', `jwt ${token}`);
+  req.send();
 }
 
 async function myIngredients(){
   let url = `${server}/myingredients`;
-  let token = localStorage.getItem("access_token");
-  try{ 
-    let response = await fetch(
-      url, 
-      {
-        method: 'GET',
-        headers: {'Content-Type':'application/json',
-                  'Authorization':`jwt ${token}`}// JSON data
-      },
-    );
-    let result=await response;
-    window.location.replace(result.url);
-  }catch(e){
-    console.log(e);
-  }
+  let token = window.localStorage.getItem("access_token");
+  var req = new XMLHttpRequest();
+  req.open('HEAD', url, true); //true means request will be async
+  req.onreadystatechange = function (aEvt) {
+    if (req.readyState == 4) {
+      if(req.status == 200){
+        console.log(req);
+        window.location.href=url;
+      }
+        //update your page here
+        //req.responseText - is your result html or whatever you send as a response
+      else{
+        alert("Error loading page\n");
+      }
+    }
+  };
+  req.setRequestHeader('Authorization', `jwt ${token}`);
+  req.send();
 }
 
 function logout(){
-  localStorage.removeItem("access_token");
+  recipes=[];
+  window.localStorage.removeItem("access_token");
   window.location.replace(server);
 }
 

@@ -133,6 +133,7 @@ nav a:hover::before {
     outline: none;
     background: transparent;
 }
+
 .submit-btn{
     width: 55%;
     padding: 10px 30px;
@@ -144,24 +145,29 @@ nav a:hover::before {
     border-radius: 30px;
     background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
 }
+
 .chkbx{
     margin: 5px 5px 10px 0;
 }
+
 span{
     margin-top: 4px;
     color: #777;
     font-size: 12px;
     position: absolute;
 }
+
 #signup{
     left: 50px;
 }
+
 #login{
     left: 450px;
 }
+
 body{
-    background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
-  }
+    background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+}
 
 .searchForm{
     min-height: 10vh;
@@ -170,7 +176,6 @@ body{
     justify-content: center;
     align-items: center;
 }
-
 
 .searchBar{
     width: 50%;
@@ -196,7 +201,6 @@ body{
     margin: 20px;
     display: flex;
     flex-direction: column;
-/* justify-content: space-around; */
     background: white;
     align-items: center;
     min-width: 40%;
@@ -217,15 +221,56 @@ li {
 }
 
 .btns{
-    margin-top: 15px;
     display: inline;
 }
-p{
-    margin: 2px;
+
+button{
+    margin-top: 10px;
+    margin-left: 5px;
 }
-h2{
+
+p{
     margin: 5px;
 }
+
+h3{
+    margin: 5px;
+}
+
 .ibtns{
     margin-top: 10px;
+}
+
+#listing{
+    float: left;
+    width: 380px;
+    height: 480px;
+    position: absolute;
+    margin: 2% auto;
+    margin-left: 25px;
+    background: #fff;
+    padding: 5px;
+    overflow: hidden;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#recipe{
+    display: inline;
+    margin: 10px;
+}
+
+#canvas{
+    float: right;
+    width: 60%;
+    height: 480px;
+    position: relative;
+    background: #fff;
+    margin-right: 150px;
+    margin-top: 1.25%;
+    text-align: center;
+}
+
+a{
+    cursor: pointer;
 }
