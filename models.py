@@ -51,7 +51,6 @@ class Recipe(db.Model):
     def toDict(self):
         return{
             'rid':self.rid,
-            'id':self.id,
             'name':self.name,
             'image':self.img,
             'recipe':self.recipeUrl,
