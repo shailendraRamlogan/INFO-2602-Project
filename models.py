@@ -44,6 +44,7 @@ class Recipe(db.Model):
     rid = db.Column(db.Integer, primary_key=True)
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(120),  unique=True, nullable=False)
+    img = db.Column(db.String(150), nullable=False)
     recipeUrl = db.Column(db.String(255), nullable=False)
     ingredients = db.Column(db.Text, nullable=False)
 
@@ -52,6 +53,7 @@ class Recipe(db.Model):
             'rid':self.rid,
             'id':self.id,
             'name':self.name,
+            'image':self.img,
             'recipe':self.recipeUrl,
             'ingredients': self.ingredients,
         }

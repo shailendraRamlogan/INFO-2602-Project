@@ -109,14 +109,14 @@ def showRecipes():
 @jwt_required()
 def addRecipe():
     userdata = request.get_json()
-    recipe = Recipe(name=userdata['name'], id=current_identity.id, recipeUrl=userdata['recipeUrl'], ingredients=userdata['ingredients'])
+    recipe = Recipe(name=userdata['name'], id=current_identity.id, img=userdata['img'], recipeUrl=userdata['recipeUrl'], ingredients=userdata['ingredients'])
     try:
         db.session.add(recipe)
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
         return 'Recipe already added. Please view in the Recipe tab.', 401
-    return 'Recipe ' + recipe.name+' added.', 201
+    return recipe.name+' saved.', 201
 
 @app.route('/recipe', methods=['GET'])
 @jwt_required()

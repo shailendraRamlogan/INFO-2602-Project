@@ -161,14 +161,14 @@ function displayRecipes(records){
   for (i=0;i<records.length;i++){
     let ingredients=records[i].ingredients;
     res.innerHTML += `
-      <div class="recipe" id="${records[i].recipe.label}">
+      <div class="recipe" id="${records[i].id}">
       <h3>${records[i].recipe.label}</h3>
       <img class="image" src="${records[i].recipe.image}"/>
       <p>Cautions: ${records[i].recipe.cautions}</p>
       <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
       <p>Health Labels: ${records[i].recipe.healthLabels}</p>
       <div class="btns">
-      <button onclick="recipeSubmit('${records[i].recipe.label}','${records[i].recipe.url}','${ingredients}')">Save Dish</button>
+      <button onclick="recipeSubmit('${records[i].id}')">Save Dish</button>
       <button onclick="goTo('${records[i].recipe.url}')">View Recipe</button>
       <button onclick="viewIngredients('${records[i].id}')">View Ingredients</button>
       </div>
@@ -187,11 +187,25 @@ function getSearch(e){
   getRecipes();
 }
 
-function recipeSubmit(name, url, ingredients){
+function recipeSubmit(recipe){
+  let name;
+  let img;
+  let url;
+  let ingredients;
+
+  for(let i=0;i<recipes.length;i++){
+    if(recipes[i].id==recipe){
+      name = recipes[i].id;
+      img = recipes[i].recipe.image;
+      url = recipes[i].recipe.url;
+      ingredients = recipes[i].ingredients.toString();
+    }
+  }
   event.preventDefault();//prevents page redirection
       
   let data = {
     name: name,
+    img: img,
     recipeUrl: url,
     ingredients: ingredients
   }
@@ -250,15 +264,15 @@ function reDraw(name){
     if(recipes[i].id==name){
       let ingredients=recipes[i].ingredients;
       res.innerHTML += `
-      <h2>${recipes[i].recipe.label}</h2>
+      <h2>${recipes[i].id}</h2>
       <img class="image" src="${recipes[i].recipe.image}"/>
       <p>Cautions: ${recipes[i].recipe.cautions}</p>
       <p>Diet Labels: ${recipes[i].recipe.dietLabels}</p>
       <p>Health Labels: ${recipes[i].recipe.healthLabels}</p>
       <div class="btns">
-      <button onclick="recipeSubmit('${recipes[i].recipe.label}','${recipes[i].recipe.url}','${ingredients}')">Save Dish</button>
+      <button onclick="recipeSubmit('${recipes[i]}')">Save Dish</button>
       <button onclick="goTo('${recipes[i].recipe.url}')">View Recipe</button>
-      <button onclick="viewIngredients('${recipes[i].recipe.label}')">View Ingredients</button>
+      <button onclick="viewIngredients('${recipes[i].id}')">View Ingredients</button>
       </div>
     `;
     }
@@ -293,11 +307,11 @@ function drawList(recipes){
     res.innerHTML+=`<p>There are currently no recipes in your list.</p><br>
                     <p>Go to the home tab to add recipes to view here.</p>`;
   }else{
+    res.innerHTML=`<ul id=recipe>`;
     for(let i=0;i<recipes.length;i++){
-      res.innerHTML+=`<div id="recipe">
-                        <a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a><br>
-                      </div>`;
+      res.innerHTML+=`<li><a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a></li><br>`;
     }
+    res.innerHTML=`</ul>`;
   }
 }
 
@@ -328,6 +342,7 @@ function showRecipe(recipe){
   res.innerHTML='';
   res.innerHTML+=`<div id="view">
                     <h2>${recipe.name}</h2>
+                    <img class="image" src="${recipe.image}"/>
                     <p>Recipe ID: ${recipe.rid}</p>
                     <p>Recipe URL: ${recipe.recipe}</p>
                     <p>Recipe Ingredients: ${recipe.ingredients}</p>
@@ -411,7 +426,7 @@ async function myRecipes(){
   let url = `${server}/myrecipes`;
   let token = window.localStorage.getItem("access_token");
   var req = new XMLHttpRequest();
-  req.open('HEAD', url); //true means request will be async
+  req.open('GET', url); //true means request will be async
   req.onreadystatechange = function (aEvt) {
     if (req.readyState == 4) {
       if(req.status == 200){
@@ -432,7 +447,7 @@ async function myIngredients(){
   let url = `${server}/myingredients`;
   let token = window.localStorage.getItem("access_token");
   var req = new XMLHttpRequest();
-  req.open('HEAD', url, true); //true means request will be async
+  req.open('GET', url, true); //true means request will be async
   req.onreadystatechange = function (aEvt) {
     if (req.readyState == 4) {
       if(req.status == 200){

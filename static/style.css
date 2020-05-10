@@ -1,7 +1,7 @@
 *{
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: 'Work Sans', sans-serif;
 }
 
 .hero{
@@ -204,7 +204,8 @@ body{
     background: white;
     align-items: center;
     min-width: 40%;
-    height: 300px;
+    height: auto;
+    min-height: 300px;
 }
 
 .image{
@@ -222,11 +223,12 @@ li {
 
 .btns{
     display: inline;
+    margin-top: 8px;
+    margin-bottom: 15px;
 }
 
-button{
-    margin-top: 10px;
-    margin-left: 5px;
+.btns button{
+    margin-left: 10px;
 }
 
 p{
@@ -234,7 +236,8 @@ p{
 }
 
 h3{
-    margin: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .ibtns{
@@ -250,14 +253,13 @@ h3{
     margin-left: 25px;
     background: #fff;
     padding: 5px;
-    overflow: hidden;
     text-align: center;
     margin-top: 20px;
 }
 
 #recipe{
     display: inline;
-    margin: 10px;
+    margin-top: 20px;
 }
 
 #canvas{
@@ -269,6 +271,10 @@ h3{
     margin-right: 150px;
     margin-top: 1.25%;
     text-align: center;
+}
+
+#canvas p{
+    margin-top: 10px;
 }
 
 a{
