@@ -54,14 +54,14 @@ class Recipe(db.Model):
             'name':self.name,
             'image':self.img,
             'recipe':self.recipeUrl,
-            'ingredients': self.ingredients,
+            'ingredients':self.ingredients,
         }
 
 class UserIngredient(db.Model):
     pid = db.Column(db.Integer, primary_key=True)
     iid = db.Column('iid', db.Integer, db.ForeignKey('ingredient.iid'))
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String(180))
+    name = db.Column(db.String(180),unique=True)
 
     def toDict(self):
         return{

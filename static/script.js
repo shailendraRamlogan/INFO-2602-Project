@@ -162,7 +162,7 @@ function displayRecipes(records){
     let ingredients=records[i].ingredients;
     res.innerHTML += `
       <div class="recipe" id="${records[i].id}">
-      <h3>${records[i].recipe.label}</h3>
+      <h3>${records[i].id}</h3>
       <img class="image" src="${records[i].recipe.image}"/>
       <p>Cautions: ${records[i].recipe.cautions}</p>
       <p>Diet Labels: ${records[i].recipe.dietLabels}</p>
@@ -200,9 +200,7 @@ function recipeSubmit(recipe){
       url = recipes[i].recipe.url;
       ingredients = recipes[i].ingredients.toString();
     }
-  }
-  event.preventDefault();//prevents page redirection
-      
+  }   
   let data = {
     name: name,
     img: img,
@@ -235,10 +233,33 @@ async function addRecipe(url, data){
   }
 }
 
+async function delRecipe(name){
+  let url=`${server}/recipes/${name}`;
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type':'application/json',
+                    'Authorization':`jwt ${token}`}// JSON data
+      },
+    );//1. Send http request and get response
+    
+    let result = await response.text();//2. Get message from response
+    alert(result);//3. Do something with the message
+    console.log(result);
+    getRecipeList();
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
+}
+
 function viewIngredients(name){
   let res = document.getElementById(`${name}`);
   res.innerHTML=``;
-  res.innerHTML=`<h2>${name}</h2>`;
+  res.innerHTML=`<h3>${name}</h3>`;
   let ingredients=[];
   let url='';
   for(let i=0;i<recipes.length;i++){
@@ -248,7 +269,10 @@ function viewIngredients(name){
     }
   }
   for(let i=0;i<ingredients.length;i++){
-    res.innerHTML+=`<p>${ingredients[i]}</p>`;
+    res.innerHTML+=`<div id="ing">
+                      <p>${ingredients[i]}</p>
+                      <button id="add" type="submit" onclick="getIngredient('${ingredients[i]}')">ADD</button>
+                    </div>`;
   }
   res.innerHTML+=`<div class="btns">
                     <button onclick="compareIngredients('${name}')">Compare Ingredients</button>
@@ -264,7 +288,7 @@ function reDraw(name){
     if(recipes[i].id==name){
       let ingredients=recipes[i].ingredients;
       res.innerHTML += `
-      <h2>${recipes[i].id}</h2>
+      <h3>${recipes[i].id}</h3>
       <img class="image" src="${recipes[i].recipe.image}"/>
       <p>Cautions: ${recipes[i].recipe.cautions}</p>
       <p>Diet Labels: ${recipes[i].recipe.dietLabels}</p>
@@ -301,20 +325,22 @@ async function getRecipeList(){
 }
 
 function drawList(recipes){
+  getRecipeList();
   let res=document.querySelector('#listing');
-  res.innerHTML=`<h3>My Recipes</h3>`;
+  res.innerHTML='';
+  res.innerHTML=`<h3>My Recipes</h3><br>`;
   if(recipes.length==0){
     res.innerHTML+=`<p>There are currently no recipes in your list.</p><br>
                     <p>Go to the home tab to add recipes to view here.</p>`;
   }else{
-    res.innerHTML=`<ul id=recipe>`;
+    res.innerHTML+=`<ul id=recipe>`;
     for(let i=0;i<recipes.length;i++){
-      res.innerHTML+=`<li><a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a></li><br>`;
+      res.innerHTML+=`<li class="listItem"><a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a></li>
+                      <button id="del" onclick="delRecipe('${recipes[i].name}')">Delete</button><br>`;
     }
-    res.innerHTML=`</ul>`;
+    res.innerHTML+=`</ul>`;
   }
 }
-
 
 async function getRecipe(name){
   let url=`${server}/recipe/${name}`;
@@ -346,10 +372,21 @@ function showRecipe(recipe){
                     <p>Recipe ID: ${recipe.rid}</p>
                     <p>Recipe URL: ${recipe.recipe}</p>
                     <p>Recipe Ingredients: ${recipe.ingredients}</p>
+                    <button id="del" type="submit" onclick="delRecipe('${recipe.name}')">Delete</button>
                   </div>`;
 }
 
-async function addIngred(url, data){
+function ingredientSubmit(event){
+  event.preventDefault();//prevents page redirection
+
+  let myform = event.target.elements;
+  let data = {
+    name: myform['name'].value.toLowerCase()
+  }
+  addIngredient(`${url}/ingredients`,data);
+}
+
+async function addIngredient(url, data){
   try{ 
     let token=window.localStorage.getItem("access_token");
     let response = await fetch(
@@ -365,6 +402,7 @@ async function addIngred(url, data){
     let result = await response.text();//2. Get message from response
     alert(result);//3. Do something with the message
     console.log(result);
+    getIngredientList();
   }catch(error){
     alert(error);
     console.log(error);//catch and log any errors
@@ -373,6 +411,7 @@ async function addIngred(url, data){
 
 async function getIngredientList(){
   let url=`${server}/ingredients`;
+  document.forms['addIngred'].addEventListener('submit',ingredientSubmit);
   try{ 
     let token=window.localStorage.getItem("access_token");
     let response = await fetch(
@@ -394,8 +433,44 @@ async function getIngredientList(){
 
 function showIngredients(ingredients){
   let res = document.querySelector('#ingredients');
-  res.innerHTML+=`<p>Ingredients Page</p>`;
+  res.innerHTML=`<h3>My Ingredients</h3><br>`;
+  if(ingredients.length==0){
+    res.innerHTML+=`<p>There are currently no ingredients in your list.</p><br>
+                    <p>Please click the Add Ingredients button to the left to add an ingredient manually or view a recipe's ingredients
+                    and click the Add button.</p>`;
+  }else{
+    res.innerHTML+=`<ul id=ingred>`;
+    for(let i=0;i<ingredients.length;i++){
+      res.innerHTML+=`<li class="listItem"><a onclick="getRcp('${ingredients[i].name}')">${ingredients[i].name}</a>
+                      <button id="delI" type="submit" onclick="delIngredient('${ingredients[i].name}')">Delete</button></li><br>`;
+    }
+    res.innerHTML+=`</ul>`;
+  }
 }
+
+async function delIngredient(name){
+  let url=`${server}/ingredients/${name}`;
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type':'application/json',
+                    'Authorization':`jwt ${token}`}// JSON data
+      },
+    );//1. Send http request and get response
+    
+    let result = await response.text();//2. Get message from response
+    alert(result);//3. Do something with the message
+    console.log(result);
+    getIngredientList();
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
+}
+
 
 function parseIng(ingredients){
 

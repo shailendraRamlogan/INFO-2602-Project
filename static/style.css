@@ -188,6 +188,7 @@ body{
     padding: 10px 20px;
     color: white;
     background: lightcoral;
+    cursor: pointer;
 }
 
 #recipes{
@@ -229,14 +230,19 @@ li {
 
 .btns button{
     margin-left: 10px;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    background: lightcoral;
+    cursor: pointer;
 }
 
 p{
     margin: 5px;
 }
 
-h3{
-    margin-top: 10px;
+h3,h2{
+    margin-top: 15px;
     margin-bottom: 10px;
 }
 
@@ -250,9 +256,8 @@ h3{
     height: 480px;
     position: absolute;
     margin: 2% auto;
-    margin-left: 25px;
+    margin-left: 40px;
     background: #fff;
-    padding: 5px;
     text-align: center;
     margin-top: 20px;
 }
@@ -268,12 +273,70 @@ h3{
     height: 480px;
     position: relative;
     background: #fff;
-    margin-right: 150px;
+    margin-right: 120px;
+    margin-left: 35px;
     margin-top: 1.25%;
     text-align: center;
 }
 
 #canvas p{
+    margin-top: 10px;
+}
+
+#playfield{
+    float: right;
+    width: 60%;
+    height: 480px;
+    position: relative;
+    background: #fff;
+    margin-right: 120px;
+    margin-left: 35px;
+    margin-top: 1.25%;
+    text-align: center;
+}
+
+#ingredients{
+    float: left;
+    width: 380px;
+    height: 480px;
+    position: absolute;
+    margin: 2% auto;
+    margin-left: 40px;
+    background: #fff;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#addIngred{
+    margin-left: 25%;
+    margin-right: 25%;
+}
+
+#addBtn{
+    margin-top: 15px;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    background: lightcoral;
+    cursor: pointer;
+}
+
+#ing p{
+   float: left;
+   margin: 10px;
+}
+
+#ing button{
+    float: right;
+    margin-top: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: white;
+    background-color: lightcoral;
+}
+
+#item{
+    display: inline;
     margin-top: 10px;
 }
 

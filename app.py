@@ -64,10 +64,10 @@ def ingredients():
 @jwt_required()
 def addIngredient():
     userdata = request.get_json()
-    ingredient = UserIngredient(name=userdata['name'], id=current_identity.id, quantity=userdata['num'])
+    ingredient = UserIngredient(name=userdata['name'], id=current_identity.id)
     db.session.add(ingredient)
     db.session.commit()
-    return ingredient.name + ' added.', 201
+    return ingredient.name + ' successfully added.', 201
 
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()
@@ -88,17 +88,15 @@ def getIngredient():
         return 'No ingredient found.'
     return json.dumps(ingredient.toDict()),200
 
-@app.route('/ingredients', methods=['DELETE'])
+@app.route('/ingredients/<name>', methods=['DELETE'])
 @jwt_required()
-def deleteIngredient():
-    userdata=request.get_json()
-    name = userdata['name']
+def deleteIngredient(name):
     ingredient = UserIngredient.query.filter_by(id=current_identity.id, name=name).first()
     if ingredient == None:
         return 'No ingredient named '+name, 403
     db.session.delete(ingredient)
     db.session.commit()
-    return name + ' successfully removed.',202
+    return name + ' successfully deleted.',202
 
 @app.route('/myrecipes')
 #@jwt_required()
