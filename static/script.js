@@ -5,6 +5,7 @@ const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
 let query = '';
 let search = '';
 let recipes=[];
+let dbingredients=[];
 let items=[];
 let myingred=[];
 let x= document.getElementById("signup");
@@ -269,11 +270,10 @@ function viewIngredients(name){
   for(let i=0;i<ingredients.length;i++){
     res.innerHTML+=`<div id="ing">
                       <p>${ingredients[i]}</p>
-                      <button id="add" type="submit" onclick="getIngredient('${ingredients[i]}')">ADD</button>
+                      <button id="add" type="submit" onclick="getIngredient('${ingredients[i]}')">+</button>
                     </div>`;
   }
   res.innerHTML+=`<div class="btns">
-                    <button onclick="compareIngredients('${name}')">Compare Ingredients</button>
                     <button onclick="goTo('${url}')">View Recipe</button>
                     <button onclick="reDraw('${name}')">View Info</button>
                   </div>`;
@@ -317,7 +317,6 @@ async function getRecipeList(){
     );
     let result=await response.json();
     drawList(result);
-    console.log(token);
   }catch(e){
     console.log(e);
   }
@@ -353,9 +352,7 @@ async function getRecipe(name){
       },
     );
     let result=await response.json();
-    console.log(result);
     showRecipe(result);
-    console.log(token);
   }catch(e){
     console.log(e);
   }
@@ -448,6 +445,38 @@ function showIngredients(ingredients){
   }
 }
 
+async function getIngredient(line){
+  dbingredients=[];
+  let url=`${server}/ingredient`;
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response.json();
+    dbingredients=result;
+    console.log(dbingredients);
+  }catch(e){
+    console.log(e);
+  }
+  let str = line.split(/[ ,]+/);
+  for(let i=0;i<str.length;i++){
+    for(let j=0;j<dbingredients.length;j++){
+      if(str[i]===dbingredients[j].name){
+        let data={
+          name: str[i]
+        }
+        addIngredient(`${server}/ingredients`,data);
+      }
+    }
+  }
+}
+
 async function delIngredient(name){
   let url=`${server}/ingredients/${name}`;
   try{ 
@@ -493,6 +522,7 @@ async function getMyIngredients(){
 }
 
 function compare(name,ingredients){
+  myingred=[];
   getIngs(name,ingredients);
 }
 
