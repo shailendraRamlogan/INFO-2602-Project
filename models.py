@@ -32,13 +32,16 @@ class User(db.Model):
 
 class Ingredient(db.Model):
     iid = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), nullable=False)
+    name = db.Column(db.String(30), nullable=False, unique=True)
 
     def toDict(self):
         return{
             'id':self.iid,
             'name':self.name,
         }
+    
+    def getId(self):
+        return self.iid
 
 class Recipe(db.Model):
     rid = db.Column(db.Integer, primary_key=True)

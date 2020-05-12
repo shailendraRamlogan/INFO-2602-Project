@@ -1,23 +1,19 @@
-# from main import db, Pokemon, app
-# import csv
+from app import db, Ingredient, app
 
-# db.create_all(app=app);
+db.create_all(app=app)
 
-# with open('pokemon.csv', encoding="utf-8") as csvfile:
-#   data = csv.DictReader(csvfile, delimiter=',')
-#   for line in data:
-#     pokemon = Pokemon(name= line['name'], attack =line['attack'], defense = line['defense'],height= line['height_m'], weight= line['weight_kg'],sp_attack= line['sp_attack'],sp_defense= line['sp_defense'],type1= line['type1'], type2= line['type2'], hp= line['hp'], speed= line['speed'])
-        
-#     if pokemon.name =='':
-#       pokemon.name ='None'
-#     if pokemon.height =='':
-#       pokemon.height ='None'
-#     if pokemon.weight =='':
-#       pokemon.weight ='None'
-#     if pokemon.type1 =='':
-#       pokemon.type1 ='None'
-#     if pokemon.type2 =='':
-#       pokemon.type2 = 'None'
+ingredients = ["apples","bananas","tomatoes","grapes","pineapple","lemon","lemons","lime","limes","celery","fish","butter","milk","yogurt",
+                "sushi rice","rice","beans","salmon","sugar","oil","carrots","broccoli","vinegar","apple cider","blueberries","raspberries",
+                "cranberries","egg","eggs","flour","baking powder","sausages","chicken","pork","lamb","beef","goat","duck","shrimp","lobster",
+                "squid","mussels","rum","ice","water","yeast","salt","icing sugar","blackberries","almond milk","almonds","peanuts",
+                "peanut butter","pears","apple","banana","cherry tomato","pimento","potato","sweet potato","spinach","mushroom","cheese","bread",
+                "corn","cucumber","garlic","onion","olives","pasta","turkey","watermelon","oranges","orange juice","ketchup","mustard","mayonnaise",
+                "bar-b-que sauce","tuna","tumeric","soy sauce","baking soda","pepper sauce","peppers","cream cheese","bread crumbs","bell pepper",
+                "cinnamon","cilantro","parsley","curry powder","black pepper","avocado","vanilla essence","nutmeg","salsa","chive","corn syrup",
+                "maple syrup","strawberries","cloves","thyme","pumpkin","peas","oats","macaroni","chocolate chips","chocolate milk","chocoloate",
+                "wine"]
 
-#   db.session.add(pokemon)
-#   db.session.commit()
+for ingredient in ingredients:
+    ingredient=Ingredient(name=ingredient)
+    db.session.add(ingredient)
+    db.session.commit()

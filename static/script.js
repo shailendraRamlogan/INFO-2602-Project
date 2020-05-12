@@ -5,17 +5,19 @@ const appKey = '7b4e785f51b5bdfb12595b7b385b35a6';
 let query = '';
 let search = '';
 let recipes=[];
+let items=[];
+let myingred=[];
 let x= document.getElementById("signup");
 let y= document.getElementById("login");
 let z= document.getElementById("btn");
 
-function login(){
+function loginBtn(){
   x.style.left= "-400px";
   y.style.left= "50px";
   z.style.left= "110px";
 }
 
-function signup(){
+function signupBtn(){
   x.style.left= "50px";
   y.style.left= "450px";
   z.style.left= "0px";
@@ -33,6 +35,7 @@ async function signUp(url, data){
     );//1. Send http request and get response
      
     let result = await response.text();//2. Get message from response
+    loginBtn();
     alert(result);
   }catch(error){
     alert(error);
@@ -144,7 +147,6 @@ async function getRecipes(){
       recipes.push(obj);
     }
     displayRecipes(recipes);
-    console.log(recipes);
   }
   catch(e){
     console.log(e);
@@ -195,7 +197,7 @@ function recipeSubmit(recipe){
 
   for(let i=0;i<recipes.length;i++){
     if(recipes[i].id==recipe){
-      name = recipes[i].id;
+      name = recipes[i].recipe.label;
       img = recipes[i].recipe.image;
       url = recipes[i].recipe.url;
       ingredients = recipes[i].ingredients.toString();
@@ -207,8 +209,7 @@ function recipeSubmit(recipe){
     recipeUrl: url,
     ingredients: ingredients
   }
-  addRecipe(`${server}/recipe`, data);
-  console.log(data);
+  addRecipe(`${server}/recipes`, data);
 }
 
 async function addRecipe(url, data){
@@ -225,8 +226,6 @@ async function addRecipe(url, data){
     );
     let result = await response.text();
     alert(result);
-    console.log(result);
-    console.log(token);
   }catch(error) {
     alert(error);
     console.log(error);
@@ -248,7 +247,6 @@ async function delRecipe(name){
     
     let result = await response.text();//2. Get message from response
     alert(result);//3. Do something with the message
-    console.log(result);
     getRecipeList();
   }catch(error){
     alert(error);
@@ -304,7 +302,9 @@ function reDraw(name){
 }
 
 async function getRecipeList(){
-  let url=`${server}/recipe`;
+  let res=document.querySelector('#canvas');
+  res.innerHTML='';
+  let url=`${server}/recipes`;
   try{ 
     let token=window.localStorage.getItem("access_token");
     let response = await fetch(
@@ -316,7 +316,6 @@ async function getRecipeList(){
       },
     );
     let result=await response.json();
-    console.log(result);
     drawList(result);
     console.log(token);
   }catch(e){
@@ -325,7 +324,6 @@ async function getRecipeList(){
 }
 
 function drawList(recipes){
-  getRecipeList();
   let res=document.querySelector('#listing');
   res.innerHTML='';
   res.innerHTML=`<h3>My Recipes</h3><br>`;
@@ -335,15 +333,15 @@ function drawList(recipes){
   }else{
     res.innerHTML+=`<ul id=recipe>`;
     for(let i=0;i<recipes.length;i++){
-      res.innerHTML+=`<li class="listItem"><a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a></li>
-                      <button id="del" onclick="delRecipe('${recipes[i].name}')">Delete</button><br>`;
+      res.innerHTML+=`<li class="listItem"><a onclick="getRecipe('${recipes[i].name}')">${recipes[i].name}</a></li><br>`;
     }
     res.innerHTML+=`</ul>`;
   }
 }
 
 async function getRecipe(name){
-  let url=`${server}/recipe/${name}`;
+  items=[];
+  let url=`${server}/recipes/${name}`;
   try{ 
     let token=window.localStorage.getItem("access_token");
     let response = await fetch(
@@ -372,7 +370,10 @@ function showRecipe(recipe){
                     <p>Recipe ID: ${recipe.rid}</p>
                     <p>Recipe URL: ${recipe.recipe}</p>
                     <p>Recipe Ingredients: ${recipe.ingredients}</p>
-                    <button id="del" type="submit" onclick="delRecipe('${recipe.name}')">Delete</button>
+                    <div class="btns">
+                      <button id="del" type="submit" onclick="compare('${recipe.name}','${recipe.ingredients}')">Compare Ingredients</button>
+                      <button id="del" type="submit" onclick="delRecipe('${recipe.name}')"><i class="fa fa-trash"></i> Delete</button>
+                    </div>
                   </div>`;
 }
 
@@ -381,7 +382,7 @@ function ingredientSubmit(event){
 
   let myform = event.target.elements;
   let data = {
-    name: myform['name'].value.toLowerCase()
+    name: myform['name'].value.replace(/\s+/g, '').toLowerCase()
   }
   addIngredient(`${url}/ingredients`,data);
 }
@@ -423,7 +424,6 @@ async function getIngredientList(){
       },
     );
     let result=await response.json();
-    console.log(result);
     showIngredients(result);
     console.log(token);
   }catch(e){
@@ -442,7 +442,7 @@ function showIngredients(ingredients){
     res.innerHTML+=`<ul id=ingred>`;
     for(let i=0;i<ingredients.length;i++){
       res.innerHTML+=`<li class="listItem"><a onclick="getRcp('${ingredients[i].name}')">${ingredients[i].name}</a>
-                      <button id="delI" type="submit" onclick="delIngredient('${ingredients[i].name}')">Delete</button></li><br>`;
+                      <button id="delI" type="submit" onclick="delIngredient('${ingredients[i].name}')"><i class="fa fa-trash"></i></button></li><br>`;
     }
     res.innerHTML+=`</ul>`;
   }
@@ -471,9 +471,97 @@ async function delIngredient(name){
   }
 }
 
+async function getMyIngredients(){
+  let url=`${server}/ingredients`;
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response.json();
+    for(let i=0;i<result.length;i++){
+      myingred.push(result[i].name);
+    }
+  }catch(e){
+    console.log(e);
+  }
+}
 
-function parseIng(ingredients){
+function compare(name,ingredients){
+  getIngs(name,ingredients);
+}
 
+async function getIngs(name,line){
+  getMyIngredients();
+  let url=`${server}/ingredient`;
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'GET',
+        headers: {'Content-Type':'application/json',
+                  'Authorization':`jwt ${token}`}// JSON data
+      },
+    );
+    let result=await response.json();
+    dbingredients=result;
+    console.log(dbingredients);
+    console.log(token);
+  }catch(e){
+    console.log(e);
+  }
+  let str = line.split(/[ ,]+/);
+  for(let i=0;i<str.length;i++){
+    for(let j=0;j<dbingredients.length;j++){
+      if(str[i]===dbingredients[j].name){
+        if(!items.includes(str[i])){
+          items.push(str[i]);
+        }
+      }
+    }
+  }
+  console.log(items);
+  drawItems(name,items);
+}
+
+function drawItems(name,items){
+  console.log(myingred);
+  let have=[];
+  let missing=[];
+  for(let i=0;i<items.length;i++){
+    for(let j=0;j<myingred.length;j++){
+      if(myingred[j]==items[i]){
+        if(!have.includes(items[i])){
+          have.push(items[i]);
+        }
+      }
+    }
+    if(!have.includes(items[i])){
+      missing.push(items[i]);
+    }
+  }
+  console.log(have);
+  console.log(missing);
+  let res=document.querySelector('#canvas');
+  res.innerHTML=`<div id="items">
+                  <h3>${name}:Needed</h3>
+                  <ul>`;
+  for(let i=0;i<missing.length;i++){
+    res.innerHTML+=`<div id="item">
+                      <li>${missing[i]}<button id="add">+</button></li>
+                    </div>`;
+  }
+  res.innerHTML+=` </ul>
+                  </div>
+                  <div id="btns">
+                    <button id="showacquired">Show Acquired</button>
+                  </div>`;   
 }
 
 async function home(){

@@ -18,7 +18,7 @@ def create_app():
 app = create_app()
 
 app.app_context().push()
-db.create_all(app=app)
+# db.create_all(app=app)
 
 def authenticate(uname, password):
     #search for the specified user
@@ -53,6 +53,14 @@ def signup():
         db.session.rollback()
         return 'Name or email already exists. Please Login or check that you have correctly entered your credentials.', 401
     return 'User ' + newuser.name+' created, Please Login to continue.', 201
+
+@app.route('/ingredient', methods=['GET'])
+def getIngredientList():
+    ingredients = Ingredient.query.all()
+    ingredients = [ingredient.toDict() for ingredient in ingredients]
+    if ingredients == None:
+        return 'There are currently no ingredients added to the list.', 200
+    return json.dumps(ingredients), 200
     
 
 @app.route('/myingredients')
@@ -64,10 +72,18 @@ def ingredients():
 @jwt_required()
 def addIngredient():
     userdata = request.get_json()
-    ingredient = UserIngredient(name=userdata['name'], id=current_identity.id)
-    db.session.add(ingredient)
-    db.session.commit()
-    return ingredient.name + ' successfully added.', 201
+    ingredient = Ingredient.query.filter_by(name=userdata['name']).first()
+    if ingredient == None:
+        return userdata['name'] + ' is not in our Ingredient Database.', 403
+    else:
+        myingredient = UserIngredient(name=userdata['name'], id=current_identity.id, iid=ingredient.getId())
+        try:
+            db.session.add(myingredient)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return 'Ingredient '+userdata['name']+' is already in your list.'
+    return myingredient.name + ' successfully added.', 201
 
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()
@@ -103,7 +119,7 @@ def deleteIngredient(name):
 def showRecipes():
     return render_template('recipes.html')
 
-@app.route('/recipe', methods=['POST'])
+@app.route('/recipes', methods=['POST'])
 @jwt_required()
 def addRecipe():
     userdata = request.get_json()
@@ -116,7 +132,7 @@ def addRecipe():
         return 'Recipe already added. Please view in the Recipe tab.', 401
     return recipe.name+' saved.', 201
 
-@app.route('/recipe', methods=['GET'])
+@app.route('/recipes', methods=['GET'])
 @jwt_required()
 def getRecipes():
     recipes= Recipe.query.filter_by(id=current_identity.id).all()
@@ -125,7 +141,7 @@ def getRecipes():
         return 'No recipes added.',200
     return json.dumps(recipes), 200
 
-@app.route('/recipe/<name>', methods=['GET'])
+@app.route('/recipes/<name>', methods=['GET'])
 @jwt_required()
 def getRecipe(name):
     recipe = Recipe.query.filter_by(id=current_identity.id, name=name).first()
@@ -133,7 +149,7 @@ def getRecipe(name):
         return 'No recipe captured.', 403
     return json.dumps(recipe.toDict()), 201
 
-@app.route('/recipe/<name>', methods=['DELETE'])
+@app.route('/recipes/<name>', methods=['DELETE'])
 @jwt_required()
 def deleteRecipe(name):
     recipe = Recipe.query.filter_by(id=current_identity.id, name=name).first()
