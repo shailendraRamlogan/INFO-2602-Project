@@ -316,6 +316,11 @@ h3,h2{
     margin-right: 25%;
 }
 
+#addIngred select{
+    float: right;
+    padding: 10px;
+}
+
 #addBtn{
     margin-top: 15px;
     border: none;
@@ -399,4 +404,18 @@ a{
 
 #show:hover{
     background-color: red;
+}
+
+#update{
+    margin-top: 15px;
+    margin-left: 40px;
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    background: lightcoral;
+    cursor: pointer;
+}
+
+.listItem{
+    display: inline;
 }

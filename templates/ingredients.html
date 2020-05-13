@@ -28,7 +28,15 @@
     <h2>Add an Ingredient</h2>
     <form id="addIngred">
       <input name="name" type="text" class="input-field" placeholder="Ingredient Name" required>
+      <select id="qty" name="qty" >
+        <option selected disabled value="0">Qty</option>
+        <option value = "0">0</option>
+        <option value = "1">1</option>
+        <option value = "2">2</option>
+        <option value = "3">3</option>
+      </select>
       <button type="submit" id="addBtn">Add Ingredient</button>
+      <button type="button" id="update" onclick="ingredientUpdate()">Update Quantity</button>
     </form>
   </div>
 <script src="../static/script.js" type="text/javascript"></script>

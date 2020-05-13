@@ -377,12 +377,49 @@ function showRecipe(recipe){
                   </div>`;
 }
 
+function ingredientUpdate(){
+  let myform = document.getElementById('addIngred');
+  let name = myform['name'].value;
+  if(name == ''){
+    alert("Please enter the name of the ingredient you would like to update.");
+    return false
+  }
+  let data = {
+    qty: myform['qty'].value
+  }
+  updateIngredient(`${url}/ingredients/${name}`,data);
+}
+
+async function updateIngredient(url,data){
+  try{ 
+    let token=window.localStorage.getItem("access_token");
+    let response = await fetch(
+      url, 
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),//convert data to JSON string
+        headers: { 'Content-Type':'application/json',
+                    'Authorization':`jwt ${token}`}// JSON data
+      },
+    );//1. Send http request and get response
+    
+    let result = await response.text();//2. Get message from response
+    alert(result);//3. Do something with the message
+    console.log(result);
+    getIngredientList();
+  }catch(error){
+    alert(error);
+    console.log(error);//catch and log any errors
+  }
+}
+
 function ingredientSubmit(event){
   event.preventDefault();//prevents page redirection
 
   let myform = event.target.elements;
   let data = {
-    name: myform['name'].value.replace(/\s+/g, '').toLowerCase()
+    name: myform['name'].value.replace(/\s+/g, '').toLowerCase(),
+    qty: myform['qty'].value
   }
   addIngredient(`${url}/ingredients`,data);
 }
@@ -424,6 +461,7 @@ async function getIngredientList(){
       },
     );
     let result=await response.json();
+    console.log(result);
     showIngredients(result);
     console.log(token);
   }catch(e){
@@ -441,7 +479,7 @@ function showIngredients(ingredients){
   }else{
     res.innerHTML+=`<ul id=ingred>`;
     for(let i=0;i<ingredients.length;i++){
-      res.innerHTML+=`<li class="listItem"><a>${ingredients[i].name}</a>
+      res.innerHTML+=`<li class="listItem"><a>${ingredients[i].quantity}</a><a>  </a><a>${ingredients[i].name}</a>
                       <button id="delI" type="submit" onclick="delIngredient('${ingredients[i].name}')"><i class="fa fa-trash"></i></button></li><br>`;
     }
     res.innerHTML+=`</ul>`;
@@ -471,7 +509,8 @@ async function getIngredient(line){
     for(let j=0;j<dbingredients.length;j++){
       if(str[i]==dbingredients[j].name){
         let data={
-          name: str[i]
+          name: str[i],
+          qty: 0
         }
         addIngredient(`${server}/ingredients`,data);
       }
@@ -626,7 +665,8 @@ function drawAcq(name){
 
 async function add(name,ing){
   let data={
-    name:ing
+    name:ing,
+    qty: 0
   }
   addIngredient(`${server}/ingredients`,data);
   drawItems(name);

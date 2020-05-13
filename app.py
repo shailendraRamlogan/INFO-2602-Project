@@ -76,7 +76,7 @@ def addIngredient():
     if ingredient == None:
         return userdata['name'] + ' is not in our Ingredient Database.', 403
     else:
-        myingredient = UserIngredient(name=userdata['name'], id=current_identity.id, iid=ingredient.getId())
+        myingredient = UserIngredient(name=userdata['name'], id=current_identity.id, iid=ingredient.getId(), qty=userdata['qty'])
         try:
             db.session.add(myingredient)
             db.session.commit()
@@ -84,6 +84,23 @@ def addIngredient():
             db.session.rollback()
             return 'Ingredient '+userdata['name']+' is already in your list.'
     return myingredient.name + ' successfully added.', 201
+
+@app.route('/ingredients/<name>', methods=['PUT'])
+@jwt_required()
+def updateIngredient(name):
+    myingredient = UserIngredient.query.filter_by(id=current_identity.id, name=name).first()
+    if myingredient == None:
+        return 'There is no ingredient with the name '+name+' in your list.',403
+    q = str(myingredient.qty)
+    data = request.get_json()
+    if 'qty' in data:
+        if q == data['qty']:
+            return name+' already has quantity '+q
+        myingredient.qty=data['qty']
+        db.session.add(myingredient)
+        db.session.commit()
+    return name+' quantity successfully changed to '+str(myingredient.qty)
+
 
 @app.route('/ingredients', methods=['GET'])
 @jwt_required()

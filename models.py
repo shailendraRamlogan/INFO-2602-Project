@@ -37,7 +37,7 @@ class Ingredient(db.Model):
     def toDict(self):
         return{
             'id':self.iid,
-            'name':self.name,
+            'name':self.name
         }
     
     def getId(self):
@@ -57,7 +57,7 @@ class Recipe(db.Model):
             'name':self.name,
             'image':self.img,
             'recipe':self.recipeUrl,
-            'ingredients':self.ingredients,
+            'ingredients':self.ingredients
         }
 
 class UserIngredient(db.Model):
@@ -65,11 +65,13 @@ class UserIngredient(db.Model):
     iid = db.Column('iid', db.Integer, db.ForeignKey('ingredient.iid'))
     id = db.Column('id', db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String(180),unique=True)
+    qty = db.Column(db.Integer, nullable=False)
 
     def toDict(self):
         return{
             'id':self.iid,
             'name':self.name,
+            'quantity':self.qty
         }
 
 # class IngredientRecipe(db.Model):
