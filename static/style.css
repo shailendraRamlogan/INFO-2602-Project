@@ -374,3 +374,29 @@ a{
 #delI:hover{
     background-color: red;
 }
+
+#add{
+    margin-left: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: white;
+    background-color: lightcoral;
+    cursor: pointer;
+}
+
+#add:hover{
+    background-color: red;
+}
+
+#show{
+    background-color: lightcoral;
+    border: none;
+    color: white;
+    padding: 12px 16px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+#show:hover{
+    background-color: red;
+}

@@ -8,6 +8,8 @@ let recipes=[];
 let dbingredients=[];
 let items=[];
 let myingred=[];
+let have=[];
+let missing=[];
 let x= document.getElementById("signup");
 let y= document.getElementById("login");
 let z= document.getElementById("btn");
@@ -339,6 +341,7 @@ function drawList(recipes){
 }
 
 async function getRecipe(name){
+  myingred=[];
   items=[];
   let url=`${server}/recipes/${name}`;
   try{ 
@@ -434,11 +437,11 @@ function showIngredients(ingredients){
   if(ingredients.length==0){
     res.innerHTML+=`<p>There are currently no ingredients in your list.</p><br>
                     <p>Please click the Add Ingredients button to the left to add an ingredient manually or view a recipe's ingredients
-                    and click the Add button.</p>`;
+                    and click the + button.</p>`;
   }else{
     res.innerHTML+=`<ul id=ingred>`;
     for(let i=0;i<ingredients.length;i++){
-      res.innerHTML+=`<li class="listItem"><a onclick="getRcp('${ingredients[i].name}')">${ingredients[i].name}</a>
+      res.innerHTML+=`<li class="listItem"><a>${ingredients[i].name}</a>
                       <button id="delI" type="submit" onclick="delIngredient('${ingredients[i].name}')"><i class="fa fa-trash"></i></button></li><br>`;
     }
     res.innerHTML+=`</ul>`;
@@ -460,14 +463,13 @@ async function getIngredient(line){
     );
     let result=await response.json();
     dbingredients=result;
-    console.log(dbingredients);
   }catch(e){
     console.log(e);
   }
   let str = line.split(/[ ,]+/);
   for(let i=0;i<str.length;i++){
     for(let j=0;j<dbingredients.length;j++){
-      if(str[i]===dbingredients[j].name){
+      if(str[i]==dbingredients[j].name){
         let data={
           name: str[i]
         }
@@ -501,6 +503,7 @@ async function delIngredient(name){
 }
 
 async function getMyIngredients(){
+  myingred=[];
   let url=`${server}/ingredients`;
   try{ 
     let token=window.localStorage.getItem("access_token");
@@ -522,12 +525,11 @@ async function getMyIngredients(){
 }
 
 function compare(name,ingredients){
-  myingred=[];
+  getMyIngredients();
   getIngs(name,ingredients);
 }
 
 async function getIngs(name,line){
-  getMyIngredients();
   let url=`${server}/ingredient`;
   try{ 
     let token=window.localStorage.getItem("access_token");
@@ -541,7 +543,6 @@ async function getIngs(name,line){
     );
     let result=await response.json();
     dbingredients=result;
-    console.log(dbingredients);
     console.log(token);
   }catch(e){
     console.log(e);
@@ -549,21 +550,21 @@ async function getIngs(name,line){
   let str = line.split(/[ ,]+/);
   for(let i=0;i<str.length;i++){
     for(let j=0;j<dbingredients.length;j++){
-      if(str[i]===dbingredients[j].name){
+      if(str[i]==dbingredients[j].name){
         if(!items.includes(str[i])){
           items.push(str[i]);
         }
       }
     }
   }
+  console.log(myingred);
   console.log(items);
-  drawItems(name,items);
+  drawItems(name);
 }
 
-function drawItems(name,items){
-  console.log(myingred);
-  let have=[];
-  let missing=[];
+function drawItems(name){
+  have=[];
+  missing=[];
   for(let i=0;i<items.length;i++){
     for(let j=0;j<myingred.length;j++){
       if(myingred[j]==items[i]){
@@ -576,23 +577,61 @@ function drawItems(name,items){
       missing.push(items[i]);
     }
   }
-  console.log(have);
-  console.log(missing);
   let res=document.querySelector('#canvas');
   res.innerHTML=`<div id="items">
-                  <h3>${name}:Needed</h3>
+                  <h3>${name} : Needed</h3>
                   <ul>`;
-  for(let i=0;i<missing.length;i++){
-    res.innerHTML+=`<div id="item">
-                      <li>${missing[i]}<button id="add">+</button></li>
-                    </div>`;
+  if(missing.length==0){
+    res.innerHTML+=`<p>You have already acquired all the necessary ingredients for this recipe.</p>
+                    <div id="btns">
+                      <button id="show" type="button" onclick="drawAcq('${name}')">Show Acquired</button>
+                    </div>`; 
+  }else{
+    for(let i=0;i<missing.length;i++){
+      res.innerHTML+=`<div id="item">
+                        <li>${missing[i]}<button id="add" type="submit" onclick="add('${name}','${missing[i]}')">+</button></li>
+                      </div>`;
+    }
+    res.innerHTML+=` </ul>
+                    </div>
+                    <div id="btns">
+                      <button id="show" type="button" onclick="drawAcq('${name}')">Show Acquired</button>
+                    </div>`;   
   }
-  res.innerHTML+=` </ul>
-                  </div>
-                  <div id="btns">
-                    <button id="showacquired">Show Acquired</button>
-                  </div>`;   
 }
+
+function drawAcq(name){
+  let res = document.querySelector('#canvas');
+  res.innerHTML=`<div id="items">
+                  <h3>${name} : Acquired</h3>
+                  <ul>`;
+  if(have.length==0){
+    res.innerHTML+=`<p>There are no acquired ingredients for this recipe.</p>
+                    <div id="btns">
+                      <button id="show" type="button" onclick="drawItems('${name}')">Show Needed</button>
+                    </div>`; 
+  }else{
+    for(let i=0;i<have.length;i++){
+      res.innerHTML+=`<div id="item">
+                        <li>${have[i]}</li>
+                      </div>`;
+    }
+    res.innerHTML+=` </ul>
+                    </div>
+                    <div id="btns">
+                      <button id="show" type="button" onclick="drawItems('${name}')">Show Needed</button>
+                    </div>`;   
+  }
+}
+
+async function add(name,ing){
+  let data={
+    name:ing
+  }
+  addIngredient(`${server}/ingredients`,data);
+  drawItems(name);
+}
+  
 
 async function home(){
   let url=`${server}/home`;
@@ -604,8 +643,6 @@ async function home(){
       if(req.status == 200){
         window.location.href=url;
       }
-        //update your page here
-        //req.responseText - is your result html or whatever you send as a response
       else{
         alert("Error loading page\n");
       }
@@ -625,8 +662,6 @@ async function myRecipes(){
       if(req.status == 200){
         window.location.href=url;
       }
-        //update your page here
-        //req.responseText - is your result html or whatever you send as a response
       else{
         alert("Error loading page\n");
       }
@@ -647,8 +682,6 @@ async function myIngredients(){
         console.log(req);
         window.location.href=url;
       }
-        //update your page here
-        //req.responseText - is your result html or whatever you send as a response
       else{
         alert("Error loading page\n");
       }
